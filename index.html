@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ma boussole de métiers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2EE;--surface:#FFFFFF;--ink:#17252B;--muted:#56666C;--line:#D3DCD6;
+  --lake:#0F3B4C;--lake-ink:#FFFFFF;--pine:#2F6B55;--signal:#E8B23A;--alert:#A8324A;
+  --soft-pine:#E1EDE6;--soft-alert:#F6E3E7;--soft-signal:#FBF0D5;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1A1F;--surface:#15252C;--ink:#E4ECE8;--muted:#9AABAF;--line:#2A3D44;
+  --lake:#8CC3D3;--lake-ink:#0E1A1F;--pine:#7CC0A3;--signal:#F0C35A;--alert:#F08A9C;
+  --soft-pine:#1B3530;--soft-alert:#3A2229;--soft-signal:#3A3220;}}
+:root[data-theme="dark"]{
+  --bg:#0E1A1F;--surface:#15252C;--ink:#E4ECE8;--muted:#9AABAF;--line:#2A3D44;
+  --lake:#8CC3D3;--lake-ink:#0E1A1F;--pine:#7CC0A3;--signal:#F0C35A;--alert:#F08A9C;
+  --soft-pine:#1B3530;--soft-alert:#3A2229;--soft-signal:#3A3220;}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--signal);outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto;padding:20px 20px 64px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.brand{font-family:var(--display);font-weight:800;font-size:1.15rem;letter-spacing:-.01em;display:flex;align-items:center;gap:.5rem}
+.brand svg{flex:none}
+.reset{background:none;border:1px solid var(--line);border-radius:999px;padding:.35rem .9rem;font-size:.9rem;color:var(--muted)}
+.reset:hover{border-color:var(--alert);color:var(--alert)}
+.trail{display:flex;gap:6px;margin:18px 0 28px;align-items:center}
+.trail span{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.trail span.on{background:var(--pine)}
+.trail span.now{background:var(--signal)}
+.trail-label{font-size:.85rem;color:var(--muted);margin:-18px 0 24px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(2.2rem,7vw,3.6rem);line-height:1.02;letter-spacing:-.03em;margin:.2em 0 .35em}
+h2{font-family:var(--display);font-weight:700;font-size:clamp(1.5rem,4.5vw,2.1rem);line-height:1.12;letter-spacing:-.02em;margin:.2em 0 .5em}
+h3{font-family:var(--display);font-weight:700;font-size:1.25rem;line-height:1.2;margin:0 0 .3em}
+p{margin:0 0 1em;max-width:62ch}
+.lede{font-size:1.12rem;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border:0;border-radius:12px;padding:.85rem 1.3rem;font-weight:700;background:var(--lake);color:var(--lake-ink);min-height:48px}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.ghost:hover{border-color:var(--ink)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.steps-intro{display:grid;gap:14px;margin:26px 0 30px;padding:0;list-style:none;counter-reset:s}
+.steps-intro li{display:grid;grid-template-columns:2.2rem 1fr;gap:12px;align-items:start;counter-increment:s}
+.steps-intro li::before{content:counter(s);font-family:var(--display);font-weight:800;font-size:1.1rem;width:2.2rem;height:2.2rem;border-radius:50%;display:grid;place-items:center;background:var(--soft-pine);color:var(--pine)}
+.steps-intro b{display:block}
+.steps-intro span{color:var(--muted)}
+/* quiz */
+.qcount{font-size:.9rem;color:var(--muted);margin-bottom:.4rem}
+.qtext{font-family:var(--display);font-weight:700;font-size:clamp(1.45rem,4.6vw,2rem);line-height:1.18;letter-spacing:-.015em;margin:0 0 1.2em;max-width:30ch}
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.scale button,.choices button{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:.9rem .4rem;min-height:64px;font-size:.92rem;line-height:1.2}
+.scale button:hover,.choices button:hover{border-color:var(--lake)}
+.scale button.sel,.choices button.sel{border-color:var(--pine);background:var(--soft-pine);font-weight:700}
+.scale button i{display:block;font-style:normal;font-family:var(--display);font-weight:800;font-size:1.3rem;margin-bottom:.15rem}
+.choices{display:grid;gap:10px}
+.choices button{text-align:left;padding:1rem 1.1rem;font-size:1rem}
+@media (max-width:520px){.scale{grid-template-columns:1fr}.scale button{display:flex;gap:.8rem;align-items:center;text-align:left;min-height:52px;padding:.6rem 1rem}.scale button i{margin:0;width:1.4rem}}
+.back{background:none;border:0;color:var(--muted);padding:.6rem 0;margin-top:14px;text-decoration:underline;text-underline-offset:3px}
+/* job card */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:26px 24px}
+.card .jt{font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,5vw,2.2rem);line-height:1.05;letter-spacing:-.02em;margin:0 0 .45em}
+.facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.tag{display:inline-flex;align-items:center;gap:.4rem;font-size:.85rem;border-radius:999px;padding:.25rem .7rem;background:var(--bg);border:1px solid var(--line)}
+.dot{width:.6rem;height:.6rem;border-radius:50%;display:inline-block}
+.ai-F{background:var(--pine)}.ai-M{background:var(--signal)}.ai-E{background:var(--alert)}
+.why{font-size:.93rem;color:var(--muted);margin-top:12px}
+.tri{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:18px}
+.tri button{border-radius:14px;border:1.5px solid var(--line);background:var(--surface);padding:1rem .5rem;font-weight:700;min-height:60px}
+.tri .y{background:var(--pine);border-color:var(--pine);color:var(--lake-ink)}
+.tri .m{background:var(--soft-signal);border-color:var(--signal)}
+.tri .n:hover{border-color:var(--alert);color:var(--alert)}
+.tri small{display:block;font-weight:400;font-size:.75rem;opacity:.75}
+.meta-line{display:flex;justify-content:space-between;align-items:center;font-size:.9rem;color:var(--muted);margin-bottom:10px}
+/* duel */
+.duel{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:stretch;margin-top:10px}
+.pick{text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:24px 20px;display:flex;flex-direction:column;gap:.6rem;min-height:220px;transition:border-color .15s,transform .15s}
+.pick:hover{border-color:var(--signal);transform:translateY(-2px)}
+.pick .jt{font-family:var(--display);font-weight:800;font-size:clamp(1.3rem,3.6vw,1.7rem);line-height:1.08;letter-spacing:-.02em}
+.pick .d{color:var(--muted);font-size:.95rem}
+.or{align-self:center;font-family:var(--display);font-weight:800;font-size:1.1rem;width:3rem;height:3rem;border-radius:50%;display:grid;place-items:center;background:var(--signal);color:#17252B}
+@media (max-width:600px){.duel{grid-template-columns:1fr}.or{justify-self:center;margin:-4px 0}.pick{min-height:0}}
+@media (prefers-reduced-motion:reduce){.pick{transition:none}.pick:hover{transform:none}}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin:6px 0 20px}
+.bar b{display:block;height:100%;background:var(--pine);transition:width .3s}
+/* results */
+.res{display:grid;gap:12px;margin:22px 0}
+details.r{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+details.r[open]{border-color:var(--lake)}
+details.r summary{list-style:none;display:grid;grid-template-columns:2.6rem 1fr auto;gap:12px;align-items:center;padding:16px 18px;cursor:pointer}
+details.r summary::-webkit-details-marker{display:none}
+.rank{font-family:var(--display);font-weight:800;font-size:1.5rem;color:var(--pine);text-align:center}
+details.r:first-of-type .rank{color:var(--ink);background:var(--signal);border-radius:10px;padding:.1rem 0}
+.rt{font-family:var(--display);font-weight:700;font-size:1.15rem;line-height:1.15}
+.chev{color:var(--muted);transition:transform .2s}
+details.r[open] .chev{transform:rotate(180deg)}
+.rbody{padding:0 18px 20px 18px;border-top:1px solid var(--line)}
+.flag{margin-top:14px;padding:12px 14px;border-radius:12px;background:var(--soft-alert);border-left:4px solid var(--alert);font-size:.93rem}
+.flag.c1{background:var(--soft-signal);border-left-color:var(--signal)}
+.flag b{display:block}
+.prog{margin-top:18px}
+.prog h4{margin:0 0 8px;font-size:1rem}
+.unis{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.unis li{display:grid;grid-template-columns:1fr auto;gap:10px;padding:.45rem .6rem;border-radius:8px;font-size:.93rem}
+.unis li:nth-child(odd){background:var(--bg)}
+.km{font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+.near{font-weight:700}
+.near .km{color:var(--pine)}
+.band{font-size:.75rem;border-radius:999px;padding:.05rem .5rem;margin-left:.4rem;border:1px solid var(--line);color:var(--muted);font-weight:400}
+.note{font-size:.88rem;color:var(--muted);margin-top:10px;font-style:italic}
+.legend{font-size:.9rem;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-top:26px}
+.legend p{max-width:none;margin:.4em 0}
+.others{margin-top:18px;font-size:.95rem}
+.fallback{width:100%;min-height:200px;margin-top:12px;font:inherit;font-size:.85rem;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:10px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:.6rem 1.1rem;border-radius:999px;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+.modal-bg{position:fixed;inset:0;background:rgba(10,20,25,.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:10}
+.modal-bg.on{display:flex}
+.modal{background:var(--surface);border-radius:18px;padding:24px;max-width:420px;width:100%}
+.kbd{font-size:.82rem;color:var(--muted);margin-top:12px}
+.empty{padding:22px;border:1.5px dashed var(--line);border-radius:16px}
+
+.unis li{grid-template-columns:1fr auto auto;align-items:center}
+.cr{font-variant-numeric:tabular-nums;font-size:.85rem;border-radius:6px;padding:.05rem .45rem;white-space:nowrap}
+.cr.ok{background:var(--soft-pine);color:var(--pine)}
+.cr.tight{background:var(--soft-signal)}
+.cr.hi{background:var(--soft-alert);color:var(--alert)}
+.cr.na{color:var(--muted)}
+.derived{margin-top:14px;font-size:.93rem}
+.derived b{display:block;margin-bottom:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:.35rem;font-size:.85rem;border:1px solid var(--line);border-radius:999px;padding:.2rem .65rem;background:var(--bg)}
+.also{font-size:.9rem;color:var(--muted);margin-top:12px}
+.crbox{display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin:18px 0}
+.crbox input{width:6.5rem;font:inherit;font-weight:700;font-size:1.1rem;padding:.4rem .6rem;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink)}
+.crbox small{color:var(--muted);flex-basis:100%}
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface);margin:12px 0 28px}
+table.top{border-collapse:collapse;width:100%;min-width:620px;font-size:.93rem}
+table.top th{text-align:left;font-weight:700;padding:10px 12px;border-bottom:2px solid var(--line);white-space:nowrap}
+table.top td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+table.top tr:last-child td{border-bottom:0}
+table.top td.n{font-family:var(--display);font-weight:800;color:var(--pine);width:2rem}
+table.top .sub{display:block;font-size:.8rem;color:var(--muted)}
+.st{font-size:.82rem;font-weight:700;border-radius:999px;padding:.15rem .6rem;white-space:nowrap;display:inline-block}
+.st.ok{background:var(--soft-pine);color:var(--pine)}
+.st.tight{background:var(--soft-signal)}
+.st.hi{background:var(--soft-alert);color:var(--alert)}
+.st.na{background:var(--bg);color:var(--muted)}
+.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;margin:16px 0 20px}
+.tabs button{flex:1;border:0;background:none;border-radius:9px;padding:.6rem .4rem;font-weight:700;font-size:.92rem;color:var(--muted);min-height:44px}
+.tabs button.on{background:var(--lake);color:var(--lake-ink)}
+.tabs button:not(.on):hover{color:var(--ink)}
+.clist{display:grid;gap:10px;margin:10px 0 26px}
+.ci{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.ci-h{display:flex;justify-content:space-between;gap:10px;align-items:center;font-family:var(--display);font-size:1.1rem}
+.ci-s{margin:.3em 0 0;font-size:.9rem;color:var(--pine);font-weight:700}
+.ci-l{margin:.3em 0 0;font-size:.9rem;color:var(--muted)}
+.ci-intro{color:var(--muted);font-size:.95rem}
+h3{margin-top:1.4em}
+.st.app{background:var(--soft-signal);border:1px dashed var(--signal);color:var(--ink)}
+h4 .st{vertical-align:middle;margin-left:.4rem}
+.crbox select{font:inherit;font-size:.95rem;padding:.45rem .6rem;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);max-width:100%}
+.nd{font-size:.75rem;color:var(--muted);font-style:italic}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="11.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M13 5 L16 13 L13 21 L10 13 Z" fill="var(--signal)"/><path d="M13 13 L16 13 L13 21 L10 13 Z" fill="var(--pine)"/></svg>
+      Ma boussole de métiers
+    </div>
+    <button class="reset" id="resetBtn" type="button">Réinitialiser</button>
+  </header>
+  <main id="app" aria-live="polite"></main>
+</div>
+
+<div class="modal-bg" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="modal">
+    <h3 id="mTitle">Tout recommencer ?</h3>
+    <p>Tes réponses dans les trois onglets (questions, tri, duels, métiers en vrac) seront effacées. Cette action ne peut pas être annulée.</p>
+    <div class="row">
+      <button class="btn" id="mYes" type="button" style="background:var(--alert)">Tout effacer</button>
+      <button class="btn ghost" id="mNo" type="button">Annuler</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- Universités (distance routière approximative depuis Saint-Jérôme) ---------- */
+const U={
+ uqosj:["UQO, campus de Saint-Jérôme",0],
+ udeml:["Université de Montréal, campus Laval",35],
+ udem:["Université de Montréal",55],
+ poly:["Polytechnique Montréal",55],
+ hec:["HEC Montréal",55],
+ uqam:["UQAM",58],
+ mcgill:["Université McGill",58],
+ conc:["Université Concordia",60],
+ ets:["ÉTS (École de technologie supérieure)",60],
+ macd:["McGill, campus Macdonald (Sainte-Anne-de-Bellevue)",70],
+ ushl:["Université de Sherbrooke, campus de Longueuil",70],
+ udemsh:["Université de Montréal, campus de Saint-Hyacinthe",115],
+ uqog:["UQO, campus de Gatineau",165],
+ uqtr:["UQTR (Trois-Rivières)",175],
+ ush:["Université de Sherbrooke",200],
+ bish:["Université Bishop's (Sherbrooke)",200],
+ ul:["Université Laval (Québec)",290],
+ uqac:["UQAC (Chicoutimi)",500],
+ uqat:["UQAT (Rouyn-Noranda)",580],
+ uqar:["UQAR (Rimouski)",590]
+};
+function band(km){return km<=70?"aller-retour possible":km<=200?"moyenne distance":"déménagement"}
+
+/* ---------- Cote R : valeurs du dernier admis, automne 2025 ----------
+ nombre = plus basse cote R admise (médecine : plus basse convoquée en entrevue ou seuil)
+ "nc" = non contingenté · "ncXX" = non contingenté, minimum XX · "~XX" = moyenne des admis
+ "lt20" = moins de 20 · "e" = sur dossier / entrevue · "pg" = profil global (notes + motivation)
+*/
+function effR(v){if(typeof v==="number")return v;if(v==="nc")return 22;if(v==="lt20")return 20;let m;if(v&&(m=/^nc([\d.]+)$/.exec(v)))return+m[1];if(v&&(m=/^~([\d.]+)$/.exec(v)))return+m[1];return null}
+function fmtR(v){
+ const c=x=>(+x).toFixed(1).replace(".",",");
+ if(typeof v==="number")return c(v);
+ if(v==="nc")return"Non contingenté";
+ if(v==="lt20")return"Moins de 20";
+ if(v==="e")return"Sur dossier";
+ if(v==="pg")return"Notes + motivation";
+ let m;if(v&&(m=/^nc([\d.]+)$/.exec(v)))return"Non contingenté (min. "+c(m[1])+")";
+ if(v&&(m=/^~([\d.]+)$/.exec(v)))return"≈ "+c(m[1])+" (moyenne)";
+ return"n.d.";
+}
+function CR(){return st.cr??30}
+function crClass(v){const e=effR(v);if(e==null)return"na";const d=e-CR();return d<=-1?"ok":d<=0.5?"tight":"hi"}
+
+/* ---------- Métiers (tous exigent au minimum un baccalauréat) ----------
+ dims : H aider · S santé · T terrain · L labo · I informatique · C construire · N nature · E enseigner · M chiffres · D créer · J lois/société
+ ai : F faible · M modérée · E élevée    yrs : 1 = 3-4 ans · 2 = 5-6 ans · 3 = 7 ans et +
+ derived : métiers connexes accessibles avec la même formation ("Titre:ai|...")
+*/
+const RAW=[
+["gciv","Ingénieur·e civil·e","Concevoir des ponts, des routes, des bâtiments et des réseaux d'eau, puis suivre leur construction sur le chantier.","C3T2M1","F","Signature professionnelle (Ordre des ingénieurs) et travail sur le terrain : l'IA accélère les calculs, mais pas la responsabilité ni le chantier.",1,
+ [["Génie civil",{poly:"nc27",conc:24,mcgill:28.5,ush:25.5,ul:"nc",uqac:"nc"}],["Génie de la construction",{ets:"nc"}]],"",
+ "Gestionnaire de projets de construction:F|Ingénieur·e en structures:M|Ingénieur·e municipal·e:F|Ingénieur·e en transport:M"],
+["gmec","Ingénieur·e mécanique","Concevoir des machines, des véhicules, des systèmes de chauffage ou des équipements de production.","C3L1M1D1","M","La conception assistée par IA progresse vite; les essais, la fabrication et la responsabilité restent humains.",1,
+ [["Génie mécanique",{poly:"nc27",ets:"nc",conc:25,mcgill:33,ush:28.2,ul:"nc",uqtr:"nc24",uqac:"nc",uqar:"nc"}]],"",
+ "Ingénieur·e en énergie renouvelable:M|Ingénieur·e en fabrication additive (impression 3D):M|Ingénieur·e en véhicules électriques:M"],
+["gele","Ingénieur·e électrique","Concevoir des réseaux d'énergie, des circuits et des systèmes de contrôle, par exemple pour Hydro-Québec.","C3I1M1L1","M","Beaucoup de simulation et de conception automatisables, mais la transition énergétique crée une forte demande.",1,
+ [["Génie électrique",{poly:"nc27",ets:"nc",conc:26,mcgill:32.3,ush:26.1,ul:"nc",uqtr:"nc24",uqog:"nc",uqac:"nc",uqar:"nc"}]],"",
+ "Ingénieur·e en réseaux électriques:F|Ingénieur·e en télécommunications:M|Ingénieur·e en instrumentation et contrôle:M"],
+["glog","Ingénieur·e logiciel","Concevoir de gros systèmes informatiques fiables : applications, plateformes, logiciels embarqués.","I3C1M1","E","L'IA écrit déjà une bonne part du code; le métier se déplace vers l'architecture, la sécurité et la supervision des outils d'IA.",1,
+ [["Génie logiciel",{poly:"nc27",ets:"nc",conc:27,mcgill:32,ul:"nc"}],["Génie informatique",{poly:"nc27",ush:26,uqog:"nc",uqtr:"nc24",conc:26,mcgill:30}]],"",
+ "Architecte de solutions infonuagiques:M|Ingénieur·e en apprentissage automatique (IA):M|Chef·fe de produit technologique:M"],
+["gbio","Ingénieur·e biomédical·e","Concevoir et adapter des appareils médicaux, des prothèses ou des équipements d'imagerie avec les équipes de santé.","S2C2L2","M","L'IA aide à concevoir et à analyser les signaux; l'homologation et le travail en milieu hospitalier restent humains.",1,
+ [["Génie biomédical",{poly:30.669}],["Bioengineering",{mcgill:33}],["Génie biotechnologique",{ush:25.8}]],"",
+ "Ingénieur·e clinique en hôpital:F|Spécialiste des affaires réglementaires (instruments médicaux):M|Conception de prothèses et d'orthèses:F"],
+["gchi","Ingénieur·e chimique","Concevoir et optimiser des procédés : médicaments, alimentation, batteries, traitement de l'eau.","L2C2M1","M","L'optimisation des procédés s'automatise; la sécurité des usines et la mise à l'échelle demandent du jugement humain.",1,
+ [["Génie chimique",{poly:"nc27",mcgill:31,conc:25,ush:24.3,ul:"nc"}]],"",
+ "Ingénieur·e en procédés pharmaceutiques:M|Ingénieur·e en batteries et hydrogène:M|Ingénieur·e en traitement des eaux:F"],
+["gaer","Ingénieur·e aérospatial·e","Concevoir des composantes d'avions, d'hélicoptères ou de satellites.","C3M1D1L1","M","La simulation s'automatise, mais la certification aéronautique impose une validation humaine rigoureuse.",1,
+ [["Génie aérospatial",{poly:30.597,conc:30,ets:"e"}],["Génie mécanique (profil aérospatial)",{mcgill:33}]],"",
+ "Ingénieur·e en navigabilité (certification):F|Ingénieur·e spatial·e (satellites):M|Ingénieur·e en essais en vol:F"],
+["gmin","Ingénieur·e des mines ou géologique","Planifier l'exploitation des mines et étudier les sols et le roc, souvent en région et sur le terrain.","T3C2N1","F","Travail de terrain et décisions de sécurité; les minéraux critiques font grimper la demande.",1,
+ [["Génie des mines",{poly:"nc27",mcgill:27.5,ul:"nc",uqat:"nc"}],["Génie géologique",{poly:"nc27",ul:"nc",uqac:"nc"}]],"",
+ "Ingénieur·e géotechnique:F|Hydrogéologue:F|Ingénieur·e en restauration de sites miniers:F"],
+["gind","Ingénieur·e industriel·le","Améliorer le fonctionnement des usines, des hôpitaux et des chaînes d'approvisionnement.","C2M2H1","M","L'analyse de données et la planification s'automatisent; l'amélioration sur le terrain reste très humaine.",1,
+ [["Génie industriel",{poly:"nc27",conc:24,uqtr:"nc24",ul:"nc"}],["Génie des opérations et de la logistique",{ets:"nc"}]],"",
+ "Ingénieur·e en santé et sécurité du travail:F|Spécialiste en chaîne d'approvisionnement:E|Amélioration continue en milieu hospitalier:M"],
+["gmat","Ingénieur·e des matériaux","Développer et tester des matériaux : alliages, composites, plastiques recyclés, matériaux pour batteries.","L2C3M1","M","La découverte de matériaux assistée par IA s'accélère; les essais et la fabrication restent humains.",1,
+ [["Génie des matériaux",{poly:"nc27",mcgill:27.5,ul:"nc"}]],"",
+ "Ingénieur·e en métallurgie:M|Spécialiste de la corrosion:F|Ingénieur·e en recyclage des matériaux:M"],
+["gphys","Ingénieur·e physicien·ne","Appliquer la physique pour concevoir des lasers, des capteurs, des fibres optiques ou des technologies quantiques.","L3C2M2","M","Travail de pointe en laboratoire; l'IA aide à simuler, mais l'expérimentation reste humaine.",1,
+ [["Génie physique",{poly:"nc27",ul:"nc"}]],"",
+ "Ingénieur·e en photonique:M|Spécialiste en technologies quantiques:M|Physicien·ne médical·e (avec maîtrise):F"],
+["grob","Ingénieur·e en robotique","Concevoir des robots et des systèmes automatisés pour les usines, la santé ou l'exploration.","C3I2L1","M","L'IA rend les robots plus intelligents, ce qui augmente la demande pour les personnes qui les conçoivent.",1,
+ [["Génie robotique",{ush:29.0}],["Génie mécatronique",{uqtr:"nc24"}],["Génie de la production automatisée",{ets:"nc"}]],"",
+ "Intégrateur·trice de systèmes automatisés:M|Ingénieur·e en vision artificielle:M|Ingénieur·e en drones et véhicules autonomes:M"],
+["gbat","Ingénieur·e du bâtiment","Concevoir la mécanique, l'énergie et l'enveloppe des bâtiments pour qu'ils soient confortables et écoénergétiques.","C3N1M1","M","La modélisation énergétique s'automatise; la coordination de chantier et les normes restent humaines.",1,
+ [["Génie du bâtiment",{ush:26.1,conc:24}],["Génie mécanique ou civil (profil bâtiment)",{ets:"nc",poly:"nc27"}]],"",
+ "Consultant·e en efficacité énergétique:M|Ingénieur·e en ventilation et climatisation:M|Spécialiste des bâtiments carboneutres:M"],
+["geau","Ingénieur·e des eaux","Gérer l'eau potable, les eaux usées et les risques d'inondation face aux changements climatiques.","N2C2T2","F","Terrain, infrastructures et responsabilité publique; forte demande liée au climat.",1,
+ [["Génie des eaux",{ul:"nc"}],["Génie civil (profil environnement)",{poly:"nc27",conc:24}]],"",
+ "Hydrologue:M|Spécialiste en gestion des risques d'inondation:M|Ingénieur·e en traitement des eaux usées:F"],
+["galim","Ingénieur·e alimentaire ou des bioressources","Concevoir des procédés pour produire des aliments sûrs et durables, et des technologies agricoles.","C2N2L2","M","L'automatisation des usines progresse; la sécurité alimentaire et l'innovation demandent du jugement humain.",1,
+ [["Génie alimentaire",{ul:"nc"}],["Génie des bioressources",{macd:25}]],"",
+ "Spécialiste en salubrité alimentaire:M|Ingénieur·e en agriculture de précision:M|Développement de nouveaux produits alimentaires:M"],
+["arp","Arpenteur·e-géomètre","Mesurer le territoire avec GPS, drones et scanneurs, et délimiter légalement les propriétés.","T3M1J1I1","M","Le traitement des données se fait de plus en plus par IA; l'acte légal et le terrain restent réservés au professionnel.",1,
+ [["Sciences géomatiques",{ul:"nc"}],["Génie géomatique",{ul:"nc"}]],"Seul programme au Québec menant à l'Ordre des arpenteurs-géomètres.",
+ "Spécialiste en cartographie par drone:E|Ingénieur·e géomaticien·ne:M|Spécialiste en jumeaux numériques de villes:M"],
+
+["med","Médecin","Diagnostiquer et traiter des patients, en clinique ou à l'hôpital, puis choisir une spécialité.","S3H3L1","F","L'IA devient un outil de diagnostic, mais la responsabilité clinique et la relation avec le patient restent humaines.",3,
+ [["Doctorat en médecine",{udem:33.159,mcgill:33.497,ush:33.043,ul:33}]],"Valeurs : plus basse cote R convoquée en entrevue (seuil minimal de 33 à Laval, 32 pour postuler à Sherbrooke). Aussi offert en campus régionaux : Trois-Rivières (UdeM), Gatineau (McGill), Saguenay (Sherbrooke).",
+ "Chercheur·e clinicien·ne:F|Médecin en santé publique:F|Médecin-conseil en industrie pharmaceutique:M"],
+["den","Dentiste","Soigner les dents et la bouche, souvent en gérant sa propre clinique.","S3H2C1","F","Travail manuel de précision et contact avec le patient : peu automatisable.",2,
+ [["Médecine dentaire",{udem:35.439,ul:33.822,mcgill:"~37"}]],"",
+ "Orthodontiste:F|Chirurgien·ne buccal·e:F|Dentiste en santé publique:F"],
+["pha","Pharmacien·ne","Conseiller les patients sur leurs médicaments, ajuster des traitements et prévenir les interactions.","S3H2L1","M","La vérification des ordonnances s'automatise; le rôle clinique et le conseil au patient prennent de l'importance.",1,
+ [["Doctorat de premier cycle en pharmacie (Pharm. D.)",{udem:34.481,ul:32.373}]],"",
+ "Pharmacien·ne d'hôpital:F|Pharmacien·ne en industrie (recherche clinique):M|Spécialiste des affaires réglementaires:M"],
+["opt","Optométriste","Examiner la vision, prescrire des lunettes et dépister des maladies de l'œil.","S3H2L1","M","L'IA lit déjà très bien les images de la rétine; l'examen et le suivi du patient restent humains.",2,
+ [["Doctorat en optométrie",{udem:"~35.6"}]],"Seul programme au Québec. Admission sur notes, questionnaire de motivation et entrevue.",
+ "Optométriste en basse vision:F|Recherche en sciences de la vision:M|Conseil en industrie optique:M"],
+["vet","Médecin vétérinaire","Soigner les animaux de compagnie, de ferme ou sauvages, et protéger la santé publique.","S3N3H1","F","Examens, chirurgies et travail avec les animaux : très peu automatisable.",2,
+ [["Doctorat en médecine vétérinaire",{udemsh:33.948}]],"Seule faculté de médecine vétérinaire au Québec.",
+ "Vétérinaire en inspection des aliments:M|Vétérinaire de la faune:F|Recherche biomédicale animale:M"],
+["phy","Physiothérapeute","Aider des personnes à retrouver leur mobilité après une blessure, une chirurgie ou une maladie.","S3H3T1","F","Travail physique, en personne, adapté à chaque patient.",2,
+ [["Physiothérapie (bac + maîtrise)",{udem:33.372,mcgill:33,ush:31.3,ul:30.839,uqac:29.582,uqtr:28.9}]],"",
+ "Physiothérapeute du sport:F|Réadaptation neurologique:F|Recherche en réadaptation:M"],
+["erg","Ergothérapeute","Aider des personnes à redevenir autonomes au quotidien : travail, école, maison.","S2H3D1","F","Évaluations en personne et solutions sur mesure : peu automatisable.",2,
+ [["Ergothérapie (bac + maîtrise)",{udem:30.135,mcgill:31,ush:29.2,ul:27.938,uqtr:27.12}]],"L'UQTR offre aussi ce programme à Drummondville (dernière cote R admise ≈ 24,8).",
+ "Ergothérapeute en santé mentale:F|Consultant·e en ergonomie et santé au travail:M|Ergothérapeute en pédiatrie:F"],
+["inf","Infirmier·ère clinicien·ne","Évaluer et soigner des patients à l'hôpital, en CLSC, à domicile ou en région éloignée.","S3H3","F","Soins directs et jugement clinique; pénurie importante de personnel.",1,
+ [["Sciences infirmières (formation initiale)",{udeml:24.5,udem:24.5,mcgill:27,ushl:24.6,ush:27.2,ul:24.046,uqtr:24.17,uqog:24,uqac:"nc22"}]],"Au campus de Saint-Jérôme de l'UQO, le bac s'adresse aux personnes qui ont déjà un DEC en soins infirmiers (cheminement DEC-BAC).",
+ "Infirmier·ère en soins critiques ou à l'urgence:F|Infirmier·ère en santé publique:F|Infirmier·ère en région nordique:F"],
+["ips","Infirmier·ère praticien·ne spécialisé·e (IPS)","Diagnostiquer, prescrire et suivre des patients de façon autonome, souvent en première ligne.","S3H3L1","F","Rôle clinique autonome, en forte croissance au Québec.",2,
+ [["Sciences infirmières (bac, formation initiale)",{udeml:24.5,udem:24.5,mcgill:27,ushl:24.6,ush:27.2,ul:24.046,uqtr:24.17,uqog:24,uqac:"nc22"}],["Maîtrise IPS (après le bac)",{uqosj:"e",udem:"e",mcgill:"e",ush:"e",ul:"e",uqtr:"e",uqog:"e"}]],"La maîtrise IPS exige le bac et de l'expérience clinique; l'admission se fait sur le dossier universitaire. Elle est offerte à Saint-Jérôme.",
+ "IPS en santé mentale:F|IPS en pédiatrie ou néonatalogie:F|Infirmier·ère chercheur·e:M"],
+["nut","Nutritionniste","Conseiller sur l'alimentation pour la santé, le sport ou le traitement de maladies.","S2H2L1","M","Les plans alimentaires générés par IA se multiplient; le suivi clinique et la relation restent humains.",1,
+ [["Nutrition",{udem:"pg",ul:28.61}],["Dietetics",{macd:28}]],"",
+ "Nutritionniste du sport:M|Spécialiste en innovation alimentaire:M|Nutritionniste en santé publique:M"],
+["orth","Orthophoniste","Aider des enfants et des adultes à mieux parler, comprendre, lire ou avaler.","S2H3E2","F","Intervention en personne, très relationnelle.",2,
+ [["Bac préparatoire (ex. sciences du langage, psychologie), puis maîtrise en orthophonie",{udem:"e",ul:"e",mcgill:"e",uqtr:"e",uqac:"nc24"}]],"La vraie sélection se fait à l'entrée de la maîtrise, sur les notes universitaires.",
+ "Orthophoniste en milieu scolaire:F|Spécialiste des troubles de déglutition (hôpital):F|Recherche en troubles du langage:M"],
+["aud","Audiologiste","Évaluer l'audition et l'équilibre, et adapter des solutions auditives.","S2H2L1","M","L'analyse des tests s'automatise; l'évaluation clinique et le suivi restent humains.",2,
+ [["Bac connexe, puis maîtrise en audiologie",{udem:"e"}]],"Accessible au niveau de la maîtrise seulement.",
+ "Audiologiste en santé au travail:M|Spécialiste en implants cochléaires:F|Conseil en industrie des aides auditives:M"],
+["chir","Chiropraticien·ne","Évaluer et traiter les problèmes du dos, des articulations et des muscles.","S3H2","F","Soins manuels en personne : peu automatisable.",2,
+ [["Doctorat en chiropratique",{uqtr:29.96}]],"Seul programme au Québec; entrevue obligatoire.",
+ "Chiropraticien·ne du sport:F|Recherche en biomécanique:M|Clinique multidisciplinaire du dos:F"],
+["podo","Podiatre","Diagnostiquer et traiter les problèmes des pieds, y compris par de petites chirurgies.","S3H2C1","F","Soins manuels et chirurgicaux en personne.",1,
+ [["Doctorat en médecine podiatrique",{uqtr:31.7}]],"Seul programme au Québec; entrevue obligatoire.",
+ "Podiatre du sport:F|Soins du pied diabétique en hôpital:F|Conception d'orthèses plantaires:M"],
+["sf","Sage-femme","Accompagner les femmes pendant la grossesse, l'accouchement et après la naissance.","S3H3","F","Présence humaine et soins directs.",1,
+ [["Pratique sage-femme",{uqtr:23.32}]],"Seul programme au Québec, très peu de places : l'entrevue et le dossier comptent autant que la cote R.",
+ "Sage-femme en région nordique:F|Recherche en santé périnatale:M|Formation de sages-femmes:F"],
+["kin","Kinésiologue","Concevoir des programmes d'activité physique pour la santé, la réadaptation ou la performance.","S2H2T2","F","Encadrement en personne et motivation : peu automatisable, même si les applications d'entraînement se multiplient.",1,
+ [["Kinésiologie",{udem:"pg",uqam:"nc21.5",ul:22.951,ush:23.6,uqtr:23.73,uqac:22.357,uqar:22.527,uqog:23}],["Kinesiology / Exercise Science",{mcgill:27,conc:27}]],"",
+ "Préparateur·trice physique d'athlètes:F|Kinésiologue en santé au travail:F|Réadaptation cardiaque:F"],
+["eps","Enseignant·e en éducation physique","Faire bouger les jeunes et leur transmettre de saines habitudes de vie.","T2E3H2S1","F","Présence physique et relation avec les élèves.",1,
+ [["Enseignement de l'éducation physique et à la santé",{udem:24.649,ul:25.558,ush:24.4,uqam:24.1,uqtr:23.44,uqac:19.542,mcgill:24.5}]],"",
+ "Entraîneur·e sportif·ve:F|Coordination sportive scolaire:F|Intervention en plein air:F"],
+["psy","Psychologue","Évaluer et traiter des difficultés psychologiques par la psychothérapie.","H3S2L1","F","Les outils conversationnels gagnent du terrain pour le soutien léger; l'évaluation et la psychothérapie restent encadrées et humaines.",3,
+ [["Psychologie (bac), puis doctorat",{udeml:26.034,udem:27.005,uqam:26.7,mcgill:28,conc:27.5,ul:26.004,ush:27.9,uqtr:"nc25",uqar:23.703,bish:24}]],"Le bac est accessible; c'est l'admission au doctorat qui est très compétitive (elle repose sur les notes universitaires).",
+ "Neuropsychologue:F|Psychologue du travail et des organisations:M|Chercheur·e en psychologie:M"],
+["psyed","Psychoéducateur·trice","Accompagner des jeunes ou des adultes en difficulté d'adaptation, à l'école, en CLSC ou en centre jeunesse.","H3E2S1","F","Intervention humaine sur le terrain.",2,
+ [["Psychoéducation (bac + maîtrise)",{uqosj:26,udem:25.515,ul:27.096,ush:27,uqtr:24.68,uqog:23}]],"",
+ "Psychoéducateur·trice en milieu scolaire:F|Intervention en centre jeunesse:F|Intervention en santé mentale adulte:F"],
+["co","Conseiller·ère d'orientation","Aider les jeunes et les adultes à choisir leur voie scolaire et professionnelle.","H3E2J1","F","Relation d'aide individuelle; les outils numériques aident, mais l'accompagnement reste humain.",2,
+ [["Orientation ou développement de carrière (bac), puis maîtrise",{ush:"lt20",uqam:"nc20",ul:"nc"}]],"",
+ "Conseiller·ère en information scolaire:M|Spécialiste en réinsertion professionnelle:F|Conseil en transition de carrière:M"],
+
+["bio","Biologiste","Étudier la faune, la flore et les écosystèmes, souvent sur le terrain, pour les protéger.","N3T2L2","F","Travail de terrain et d'expertise; l'IA aide surtout à analyser les données.",1,
+ [["Biologie",{udem:26.343,uqam:"nc",mcgill:28,conc:26,ul:"nc",ush:"nc",uqtr:"nc",uqar:24.378,uqac:"nc",bish:24}]],"",
+ "Biologiste de la faune (gouvernement):F|Consultant·e en évaluation environnementale:M|Éducation scientifique ou guide-naturaliste:F"],
+["bch","Chercheur·e en biochimie ou en sciences biomédicales","Étudier les molécules du vivant pour développer des médicaments, des vaccins ou des tests.","L3S2","M","L'IA transforme la recherche (prédiction des protéines, par exemple); les expériences en laboratoire restent humaines.",2,
+ [["Biochimie",{udem:26.038,uqam:"nc",mcgill:28,conc:25,ul:"nc",ush:"nc",bish:24}],["Sciences biomédicales",{udem:30.854,ul:27.5,uqtr:"nc24"}]],"",
+ "Associé·e de recherche clinique:M|Spécialiste en biotechnologie:M|Représentant·e scientifique en industrie pharmaceutique:M"],
+["mic","Microbiologiste","Étudier les bactéries et les virus pour la santé, l'alimentation ou l'environnement.","L3S2N1","M","L'analyse de laboratoire s'automatise en partie; l'expertise et la recherche restent humaines.",1,
+ [["Microbiologie",{udem:26.013,mcgill:28,ul:"nc",ush:"nc"}]],"",
+ "Contrôle de la qualité (aliments, pharmaceutique):M|Spécialiste en prévention des infections:F|Recherche en vaccins:M"],
+["pharmaco","Scientifique en pharmacologie","Étudier comment les médicaments agissent dans le corps et participer à leur développement.","L3S2","M","L'IA accélère la découverte de molécules; les essais et la validation restent humains.",2,
+ [["Pharmacologie",{ush:22.9}],["Sciences biopharmaceutiques",{udem:30.186}]],"",
+ "Associé·e de recherche clinique:M|Toxicologue:M|Spécialiste des affaires réglementaires:M"],
+["neuro","Neuroscientifique","Étudier le cerveau et le système nerveux pour comprendre et traiter ses maladies.","L3S2","M","L'IA aide à analyser l'imagerie cérébrale; la recherche expérimentale reste humaine. Carrière en recherche : doctorat.",3,
+ [["Neurosciences",{udem:30.743,mcgill:33.5,conc:27.5}],["Neuroscience cognitive",{udem:27.011}]],"",
+ "Neuropsychologue (avec doctorat):F|Interfaces cerveau-machine:M|Recherche clinique en neurologie:M"],
+["bioinf","Bio-informaticien·ne","Utiliser la programmation pour analyser l'ADN, les protéines et les grandes données biologiques.","I3L2S1","E","Domaine très informatisé, donc très exposé; mais la génomique en santé crée beaucoup de nouveaux besoins.",1,
+ [["Bio-informatique",{udem:"nc25",ul:"nc"}],["Biologie des systèmes et de l'information",{conc:28}]],"",
+ "Spécialiste en génomique clinique:M|Scientifique des données en santé:E|Recherche en médecine personnalisée:M"],
+["fors","Scientifique judiciaire (forensique)","Analyser les traces laissées sur une scène de crime : ADN, drogues, empreintes, données numériques.","L3J2I1","M","L'IA accélère l'analyse, mais la chaîne de preuve et le témoignage en cour exigent un expert humain.",1,
+ [["Science forensique, profil physique",{uqtr:25.85}],["Science forensique, profil chimique",{uqtr:30.0}],["Science forensique, profil biologique",{uqtr:31.48}],["Science forensique, profil numérique",{uqtr:23.6}]],"Seul programme du genre au Québec.",
+ "Analyste en laboratoire de sciences judiciaires:M|Enquêteur·euse en cybercriminalité:M|Toxicologue judiciaire:M"],
+["chim","Chimiste","Analyser, créer ou améliorer des substances : médicaments, matériaux, contrôle de la qualité.","L3C1","M","Les analyses de routine s'automatisent; la recherche et l'innovation demeurent.",1,
+ [["Chimie",{udem:"nc22",uqam:"nc",mcgill:28,conc:25,ul:"nc",ush:"nc",uqtr:"nc",uqac:"nc",uqar:"nc",bish:24}]],"",
+ "Chimiste en environnement:M|Chimiste en cosmétiques ou en alimentation:M|Spécialiste en chimie verte:M"],
+["phys","Physicien·ne ou astrophysicien·ne","Comprendre les lois de l'Univers, de l'atome aux galaxies, souvent en recherche.","L3M2I1","M","L'IA accélère l'analyse et la simulation; une carrière en recherche demande généralement un doctorat.",3,
+ [["Physique",{udem:"nc25",mcgill:28,conc:24,ul:"nc",ush:"nc",bish:24}]],"",
+ "Physicien·ne médical·e (radiothérapie):F|Analyste quantitatif·ve en finance:E|Spécialiste en énergie:M"],
+["geol","Géologue","Étudier le roc, les sols et l'eau souterraine pour les mines, l'environnement ou la construction.","T3N2L1","F","Travail de terrain important et forte demande liée aux minéraux critiques.",1,
+ [["Géologie",{uqam:"nc",ul:"nc",uqac:"nc"}],["Earth and Planetary Sciences",{mcgill:28}]],"",
+ "Hydrogéologue:F|Géologue d'exploration minière:F|Géotechnique environnementale:F"],
+["ocean","Océanographe","Étudier les océans, le fleuve Saint-Laurent et la vie marine face aux changements climatiques.","N3L2T2","M","Travail en mer et expertise; l'IA aide surtout à traiter les données satellitaires.",2,
+ [["Biologie, chimie ou géologie (bac), puis maîtrise en océanographie",{uqar:24.378,mcgill:28}]],"L'UQAR (Rimouski) abrite l'Institut des sciences de la mer (ISMER).",
+ "Biologiste marin·e:F|Gestion des pêches:M|Recherche polaire:M"],
+["met","Météorologue ou climatologue","Prévoir la météo et étudier le climat pour la sécurité, l'énergie ou l'agriculture.","N2L2M2I1","E","Les modèles de prévision par IA égalent déjà les modèles classiques; le métier se déplace vers l'expertise et la communication du risque.",1,
+ [["Météorologie (sciences de la Terre et de l'atmosphère)",{uqam:"nc"}],["Atmospheric and Oceanic Sciences",{mcgill:28}]],"",
+ "Climatologue en assurance ou en énergie:E|Adaptation aux changements climatiques:M|Météorologue en aviation:M"],
+["act","Actuaire","Évaluer les risques financiers pour les assurances et les régimes de retraite.","M3I1","E","Métier très quantitatif, fortement touché par l'automatisation des modèles; le jugement et la signature professionnelle restent.",1,
+ [["Actuariat",{udem:"nc",uqam:"nc",ul:"nc"}],["Actuarial Mathematics",{conc:28}]],"Concordia exige aussi une cote R d'au moins 30 dans les cours de mathématiques.",
+ "Gestionnaire de risques:E|Analyste en régimes de retraite:E|Actuaire en assurance climatique:M"],
+["dat","Scientifique des données","Trouver des tendances dans de grandes quantités de données pour aider à prendre des décisions.","I3M3L1","E","L'IA automatise une grande partie de l'analyse; la valeur se déplace vers la définition des bonnes questions.",1,
+ [["Statistique ou science des données",{udem:"nc22",uqam:"nc",mcgill:28,conc:27,ul:"nc",ush:"nc"}]],"",
+ "Ingénieur·e en IA:M|Analyste en santé publique:M|Analyste sportif·ve:E"],
+["dev","Développeur·euse / informaticien·ne","Créer des applications, des sites web, des jeux vidéo ou des outils informatiques.","I3D1","E","Parmi les métiers les plus touchés : l'IA écrit du code rapidement, et les postes débutants sont les plus exposés.",1,
+ [["Informatique",{uqosj:"nc",udem:"nc25",uqam:"nc",mcgill:28,conc:27,ul:"nc",ush:"nc",uqtr:"nc",uqog:23,uqac:"nc",uqar:"nc",bish:24}]],"",
+ "Développeur·euse de jeux vidéo:E|Spécialiste en IA appliquée:M|Chef·fe de projets numériques:M"],
+["cyb","Spécialiste en cybersécurité","Protéger les entreprises et les gouvernements contre les pirates informatiques.","I3J1M1","M","L'IA sert aux attaquants comme aux défenseurs : le domaine se transforme, mais la demande reste forte.",1,
+ [["Informatique ou génie informatique (profil sécurité)",{poly:"nc27",ets:"nc",conc:26,udem:"nc25",ush:26,ul:"nc",uqog:23}]],"",
+ "Enquêteur·euse en cybercriminalité:M|Audit de sécurité informatique:M|Protection de la vie privée:M"],
+["sig","Géographe ou analyste en géomatique","Cartographier et analyser le territoire pour l'urbanisme, l'environnement ou les ressources naturelles.","T2N2I2","E","La cartographie et l'analyse d'images s'automatisent rapidement; l'expertise terrain et l'interprétation restent.",1,
+ [["Géographie",{udem:"nc22",uqam:"nc",conc:23,mcgill:26.9,ul:"nc"}],["Géomatique appliquée à l'environnement",{ush:23.4}]],"",
+ "Télédétection (images satellites):E|Analyste en aménagement du territoire:M|Cartographie des risques naturels:M"],
+["env","Spécialiste en environnement","Évaluer et réduire l'impact des projets sur l'eau, l'air, les sols et la biodiversité.","N3T2J1","F","Travail de terrain, réglementation et relations avec les communautés.",1,
+ [["Sciences de l'environnement",{uqtr:"nc",conc:25,macd:25}],["Études de l'environnement (sciences naturelles)",{ush:22.4}]],"",
+ "Consultant·e en évaluation environnementale:M|Développement durable en entreprise:M|Inspecteur·trice environnemental·e:F"],
+["agr","Agronome","Conseiller les producteurs agricoles sur les cultures, les sols et l'élevage.","N3T2L1","F","Travail sur le terrain avec les producteurs; l'IA aide surtout à l'agriculture de précision.",1,
+ [["Agronomie",{ul:"nc"}],["Agricultural and Environmental Sciences",{macd:25}]],"",
+ "Conseil en agriculture biologique:F|Agriculture urbaine:F|Agronome en industrie des semences:M"],
+["for","Ingénieur·e forestier·ère","Planifier l'aménagement des forêts, leur récolte et leur protection.","N3T3","F","Beaucoup de terrain; l'IA et les drones améliorent surtout l'inventaire forestier.",1,
+ [["Aménagement et environnement forestiers",{ul:"nc"}]],"Programme menant à l'Ordre des ingénieurs forestiers du Québec.",
+ "Spécialiste en feux de forêt:F|Aménagement en territoire autochtone:F|Bioproduits forestiers:M"],
+
+["arch","Architecte","Concevoir des bâtiments beaux, durables et fonctionnels, du croquis au chantier.","D3C2","M","Les outils génératifs accélèrent la conception; la vision, les normes et la coordination restent humaines.",2,
+ [["Architecture (bac + maîtrise)",{udem:31.641,mcgill:32.7,ul:29.587}]],"",
+ "Architecte en conservation du patrimoine:M|Designer d'intérieur:E|Spécialiste en modélisation du bâtiment (BIM):E"],
+["urb","Urbaniste","Planifier l'aménagement des villes et des villages : quartiers, transport, espaces verts.","D2J2N1H1","M","L'analyse s'automatise; la concertation avec les citoyens et les élus reste humaine.",1,
+ [["Urbanisme",{udem:22.811,uqam:"nc21"}],["Urban Planning",{conc:21}],["Aménagement du territoire et développement régional",{ul:"nc"}]],"",
+ "Planification des transports:M|Revitalisation urbaine:M|Conseil en aménagement municipal:M"],
+["des","Designer industriel·le","Concevoir des objets du quotidien : meubles, équipements sportifs, appareils, emballages.","D3C2","E","Les outils génératifs produisent des concepts en quelques secondes; le prototypage et la compréhension des usagers restent.",1,
+ [["Design industriel",{udem:23.722}],["Design de produits",{ul:"nc"}]],"",
+ "Designer d'expérience utilisateur (UX):E|Designer d'équipements sportifs:M|Aménagement intérieur de véhicules:M"],
+["esec","Enseignant·e au secondaire (sciences ou maths)","Enseigner les sciences ou les mathématiques aux adolescents.","E3H2L1","F","Relation avec les élèves et gestion de classe; forte pénurie au Québec.",1,
+ [["Enseignement secondaire : sciences et technologie",{udem:24.764,uqam:25,mcgill:24.5,ul:"nc",ush:"lt20",uqtr:23.81,uqog:22,uqac:"nc24",uqar:"nc22",bish:25},"SN"],["Enseignement secondaire : mathématiques",{udem:23.205,uqam:24.5,mcgill:24.5,ul:"nc",ush:"lt20",uqtr:25.73,uqog:22,uqac:"nc24",bish:25},"M"]],"",
+ "Enseignant·e au collégial (avec maîtrise):F|Conseiller·ère pédagogique:M|Conception de contenu éducatif:E"],
+["epri","Enseignant·e au primaire","Enseigner à des enfants de 5 à 12 ans et les accompagner dans leur développement.","E3H3D1","F","Relation humaine au cœur du métier; forte pénurie au Québec.",1,
+ [["Éducation préscolaire et enseignement primaire",{uqosj:26,udeml:22.1,udem:22.019,uqam:22,mcgill:24.5,conc:26,ul:"nc",ush:"lt20",uqtr:23.1,uqog:19,uqac:"nc22",uqar:"nc22",bish:25}]],"",
+ "Orthopédagogue:F|Direction d'école:F|Conseiller·ère pédagogique:M"],
+["ada","Enseignant·e en adaptation scolaire","Aider des élèves qui ont des difficultés d'apprentissage à réussir.","E3H3","F","Intervention individualisée et humaine.",1,
+ [["Enseignement en adaptation scolaire",{uqosj:23,udeml:22.1,udem:22.06,uqam:23.5,ush:22,uqtr:20.78,ul:"nc",uqac:"nc22",uqog:23,uqar:"nc22"}]],"",
+ "Orthopédagogie en pratique privée:F|Intervention en autisme:F|Conseil en inclusion scolaire:F"],
+["ts","Travailleur·euse social·e","Soutenir des personnes et des familles en difficulté et les aider à trouver des ressources.","H3J2","F","Relation d'aide et intervention sur le terrain.",1,
+ [["Travail social",{uqosj:26,udeml:26.512,udem:27.634,mcgill:27,uqam:26.7,ul:25.892,ush:25.8,uqac:26.242,uqar:24.872,uqog:24}]],"",
+ "Travail social en milieu hospitalier:F|Protection de la jeunesse:F|Organisation communautaire:F"],
+["crim","Criminologue","Intervenir auprès de personnes contrevenantes ou victimes, ou analyser la criminalité.","J3H2","F","Intervention humaine; l'analyse des données criminelles s'automatise en partie.",1,
+ [["Criminologie",{udem:27.212,ul:27.308}]],"L'UdeM offre aussi une majeure en criminologie au campus Laval (dernière cote R admise ≈ 24,0).",
+ "Agent·e de probation:F|Analyste en renseignement criminel:M|Intervention auprès des victimes:F"],
+["rh","Conseiller·ère en ressources humaines (CRHA)","Recruter, former et accompagner les employés, et gérer les relations de travail.","H3J2M1","M","Le tri des candidatures et l'administration s'automatisent; les relations humaines et la négociation demeurent.",1,
+ [["Relations industrielles",{udem:22.307,ul:"nc22",uqog:23}],["Gestion des ressources humaines",{uqam:"nc22"}]],"L'UQO offre aussi un certificat en relations industrielles au campus de Saint-Jérôme.",
+ "Relations de travail:M|Santé et sécurité du travail:F|Développement organisationnel:M"],
+["eco","Économiste","Analyser l'économie pour conseiller gouvernements, banques et entreprises.","M3J2","E","Les modèles et les prévisions s'automatisent fortement; l'interprétation et le conseil politique restent.",2,
+ [["Sciences économiques",{udem:"nc",uqam:"nc",ul:"nc22",ush:23.9,conc:23,mcgill:26.9,uqog:25}]],"",
+ "Analyse de politiques publiques:M|Économie de l'environnement:M|Développement international:M"],
+["cpa","Comptable professionnel·le agréé·e (CPA)","Préparer et vérifier les états financiers, conseiller les entreprises sur la fiscalité et la gestion.","M3J1","E","La tenue de livres et la production de rapports s'automatisent fortement; le conseil stratégique demeure.",2,
+ [["Sciences comptables (puis DESS menant au titre CPA)",{uqosj:"nc",hec:27.5,uqam:"nc22",conc:27,mcgill:29.4,ul:"nc25",ush:24,uqtr:"nc22",uqog:24}]],"",
+ "Juricomptable (enquêtes financières):M|Contrôle de gestion:E|Fiscalité:E"],
+["fin","Analyste financier·ère","Analyser des entreprises et des marchés pour guider des investissements.","M3I1","E","L'analyse financière est l'un des domaines les plus exposés à l'IA.",1,
+ [["Administration des affaires (finance)",{uqosj:"nc",hec:27.5,uqam:"nc22",conc:27,mcgill:29.4,ul:"nc25",ush:24,uqog:24}]],"",
+ "Finance durable (ESG):M|Fusions et acquisitions:E|Planification financière:M"],
+["avo","Avocat·e","Conseiller et représenter des personnes ou des entreprises devant les tribunaux.","J3H2","M","La recherche juridique et la rédaction s'automatisent vite; la plaidoirie et le conseil restent humains.",2,
+ [["Droit (puis École du Barreau)",{udem:32.112,uqam:30.1,mcgill:"~34.4",ul:30.207,ush:29.9,uqog:29}]],"",
+ "Droit de l'environnement:M|Propriété intellectuelle (technologies):M|Conseil juridique en entreprise:M"],
+["not","Notaire","Rédiger des contrats, des testaments et des actes immobiliers officiels.","J3M1H1","E","La rédaction de documents juridiques est très exposée; le rôle d'officier public et le conseil demeurent.",2,
+ [["Droit, puis maîtrise en droit notarial",{udem:32.112,mcgill:"~34.4",ul:30.207,ush:29.9}]],"",
+ "Droit immobilier:E|Planification successorale:M|Médiation familiale:F"]
+];
+
+/* ---------- Métiers ajoutés : parcours accessibles en Sciences humaines ---------- */
+RAW.push(
+["journ","Journaliste","Enquêter, interviewer et raconter l'actualité pour la presse écrite, la radio, la télé ou le web.","R3G3D1H1","E","La rédaction de nouvelles simples s'automatise; l'enquête, le terrain et la vérification des faits restent humains.",1,
+ [["Journalisme",{uqam:21.65,conc:22,ul:"nc22"}],["Communication (profil journalisme)",{udem:23.138,uqog:24}]],"UQAM : entrevue; Concordia : lettre et portfolio.",
+ "Journaliste d'enquête:M|Recherchiste télé ou radio:E|Journaliste sportif·ve:E"],
+["comm","Conseiller·ère en communication","Gérer l'image d'une organisation : relations de presse, médias sociaux, campagnes, discours.","R3H2D2G1","E","La production de textes et de visuels s'automatise vite; la stratégie et la gestion de crise restent humaines.",1,
+ [["Communication",{udem:23.138,conc:24,uqog:24,ush:"nc",uqac:24}],["Communication stratégique et relations publiques",{uqam:23,uqtr:24,ul:"nc22"}]],"",
+ "Relationniste de presse:M|Gestionnaire de médias sociaux:E|Porte-parole:M"],
+["mkt","Spécialiste en marketing","Comprendre les consommateurs et concevoir la façon de faire connaître un produit ou une marque.","D2M2R2H1","E","L'analyse de marché et la création publicitaire sont très exposées à l'IA; la stratégie de marque demeure.",1,
+ [["Administration des affaires (marketing)",{uqosj:"nc",hec:27.5,uqam:22,conc:27,ush:25,ul:"nc",uqtr:22,mcgill:29.4}]],"",
+ "Stratège en publicité:E|Analyste en études de marché:E|Gestionnaire de marque:M"],
+["gestion","Gestionnaire ou entrepreneur·e","Diriger une équipe, une entreprise ou lancer sa propre affaire.","M2H2J1D1","M","L'IA prend en charge une partie de l'administration; le leadership et les décisions restent humains.",1,
+ [["Administration des affaires (management)",{uqosj:"nc",hec:27.5,uqam:22,conc:27,ush:25,ul:"nc",uqtr:22,uqog:"nc",mcgill:29.4}]],"Au campus de Saint-Jérôme, le bac régulier n'est pas contingenté (le profil coop demande 24).",
+ "Entrepreneur·e:M|Gestionnaire des opérations:M|Consultant·e en management:M"],
+["polsci","Politologue ou analyste politique","Analyser la politique et les institutions pour conseiller élus, partis, médias ou organismes.","G3R2J2","M","L'analyse documentaire s'automatise; le conseil politique et les relations humaines demeurent.",1,
+ [["Science politique",{udem:24.007,uqam:"nc",conc:21,ush:21.4,ul:"nc22",uqac:"nc",uqog:"nc",mcgill:26.9,bish:24}]],"",
+ "Attaché·e politique:M|Analyste en politiques publiques:M|Relationniste gouvernemental·e:M"],
+["ri","Spécialiste en relations internationales","Travailler sur les enjeux entre pays : diplomatie, commerce, aide internationale, sécurité.","G3R2J1","M","Les dossiers d'analyse s'automatisent; la négociation et le travail sur le terrain restent humains.",1,
+ [["Études internationales",{udem:27.463,uqam:27.5,ul:28.441,uqog:"nc",mcgill:26.9,bish:24}]],"",
+ "Diplomate:M|Développement international:M|Travail humanitaire:F"],
+["hist","Historien·ne ou archiviste","Étudier le passé, conserver les archives et rendre l'histoire accessible au public.","G2R2L1","M","L'IA aide à fouiller et à classer les documents; l'interprétation et la conservation restent humaines.",1,
+ [["Histoire",{udem:22,uqam:"nc",conc:20,ush:21.2,ul:"nc",uqac:"nc",uqtr:"nc",uqog:"nc",mcgill:26.9,bish:24}]],"",
+ "Archiviste:M|Consultant·e en patrimoine:M|Recherchiste historique pour les médias:E"],
+["anthro","Anthropologue ou sociologue","Étudier les sociétés, les cultures et les comportements humains, souvent sur le terrain.","G3H1R2T1","M","L'analyse de données sociales s'automatise; les entrevues et l'observation sur le terrain restent humaines.",1,
+ [["Anthropologie",{udem:22,conc:22,ul:"nc22",uqam:"nc",mcgill:26.9}],["Sociologie",{udem:22,uqam:"nc",conc:22,ul:"nc22",uqog:"nc"}]],"",
+ "Archéologue:F|Consultant·e en diversité et inclusion:M|Chercheur·e en opinion publique:E"],
+["ling","Linguiste","Étudier le fonctionnement des langues; c'est aussi une porte d'entrée vers l'orthophonie.","R2L2E1","E","Le traitement automatique des langues progresse très vite; la recherche et l'expertise demeurent.",1,
+ [["Linguistique / sciences du langage",{udem:22,uqam:"nc",conc:22,ul:"nc",uqac:24,mcgill:26.9}]],"Plusieurs orthophonistes commencent par un bac en linguistique avant la maîtrise.",
+ "Terminologue:E|Spécialiste du traitement automatique des langues:M|Orthophoniste (via la maîtrise):F"],
+["trad","Traducteur·trice","Traduire des textes techniques, juridiques, médicaux ou littéraires.","R3G1","E","Parmi les métiers les plus exposés : la traduction automatique est déjà très bonne. La révision spécialisée et l'interprétation demeurent.",1,
+ [["Traduction",{udem:22,conc:25,ush:"nc",ul:"nc",uqog:"nc",mcgill:26.9}]],"",
+ "Interprète de conférence:M|Localisation de jeux vidéo:E|Sous-titrage:E"],
+["sexo","Sexologue","Accompagner des personnes et des couples, et faire de l'éducation à la sexualité.","H3S1J1","F","Relation d'aide et intervention en personne.",1,
+ [["Sexologie",{uqam:27.9,ul:23.993}]],"Laval : test d'admission.",
+ "Éducation à la sexualité en milieu scolaire:F|Sexothérapeute (avec maîtrise):F|Intervention en santé sexuelle:F"],
+["loisir","Gestionnaire en loisir, culture et tourisme","Organiser des événements, des festivals, des activités de loisir ou des expériences touristiques.","H2T2D1G1","M","La planification s'automatise en partie; l'organisation sur le terrain et l'accueil restent humains.",1,
+ [["Loisir, culture et tourisme",{uqtr:"nc",conc:20,uqam:"nc"}],["Gestion du tourisme et de l'hôtellerie",{uqam:22}]],"",
+ "Gestionnaire d'événements:M|Coordination d'un centre culturel:M|Tourisme d'aventure:F"],
+["intsport","Intervenant·e sportif·ve ou en plein air","Encadrer des athlètes, des équipes ou des groupes en plein air.","T3E2H2","F","Présence physique et encadrement humain.",1,
+ [["Intervention sportive / plein air",{ul:23.024,uqac:20.57,uqtr:"nc",conc:20,bish:24}]],"",
+ "Entraîneur·e sportif·ve:F|Coordination des sports:F|Guide en plein air:F"],
+["pubadmin","Gestionnaire public·que","Diriger des programmes et des services au gouvernement ou dans une municipalité.","J2G2M1","M","L'administration courante s'automatise; la gestion des services publics demeure humaine.",1,
+ [["Affaires publiques / gestion publique",{uqam:21,ul:27.254}]],"",
+ "Direction générale d'une municipalité:M|Élaboration de programmes gouvernementaux:M|Analyse budgétaire publique:E"],
+["secur","Spécialiste en sécurité et en enquête","Enquêter sur des fraudes, analyser des menaces ou gérer la sécurité publique.","J3T1","M","L'analyse de données s'automatise; l'enquête et le terrain restent humains.",1,
+ [["Sécurité et études policières",{udem:24.192}]],"",
+ "Enquêteur·euse en fraude:M|Analyste en sécurité publique:M|Gestion des mesures d'urgence:F"],
+["museo","Muséologue ou médiateur·trice culturel·le","Concevoir des expositions et faire découvrir l'art, l'histoire ou la science au public.","D2G2E2","M","L'IA aide à produire du contenu; la conception d'expériences et la médiation restent humaines.",1,
+ [["Histoire de l'art / muséologie",{udem:19,uqam:"nc",conc:19,ul:"nc",mcgill:26.9}]],"",
+ "Commissaire d'exposition:M|Médiation culturelle:F|Muséologue scientifique:M"],
+["esecsh","Enseignant·e au secondaire (univers social, français)","Enseigner l'histoire, la géographie ou le français aux adolescents.","E3R2G2H1","F","Relation avec les élèves et gestion de classe; forte pénurie au Québec.",1,
+ [["Enseignement secondaire : univers social",{udem:23.085,uqam:24.5,ush:23.4,ul:"nc",uqac:24,uqtr:20.85,uqog:22,mcgill:24.5,bish:25}],["Enseignement secondaire : français",{udem:22.758,uqam:22.5,ush:22.2,ul:"nc",uqtr:23.34,uqog:22}]],"",
+ "Enseignant·e d'anglais langue seconde:F|Conseiller·ère pédagogique:M|Enseignant·e au cégep (avec maîtrise):F"],
+["demo","Démographe ou analyste de sondages","Étudier la population et l'opinion publique à l'aide des statistiques.","M3G2","E","Travail très quantitatif, fortement exposé à l'automatisation.",1,
+ [["Démographie et statistique",{udem:22}]],"",
+ "Analyste de sondages:E|Analyste en planification des services publics:M|Chercheur·e en santé des populations:M"],
+["redac","Rédacteur·trice ou auteur·e","Écrire des textes professionnels, des scénarios, des livres ou du contenu pour le web.","R3D3","E","L'IA génère déjà beaucoup de texte courant; la création originale et la révision experte demeurent.",1,
+ [["Écriture de scénario et création littéraire",{udem:23.612}],["Rédaction professionnelle / études littéraires",{uqam:"nc",ush:"nc",ul:"nc",uqtr:24,uqog:24}]],"",
+ "Scénariste:M|Réviseur·e linguistique:E|Rédacteur·trice technique:E"]
+);
+
+const JOBS=RAW.map(a=>{const d={};a[3].replace(/([A-Z])(\d)/g,(_,k,v)=>{d[k]=+v});
+ return{id:a[0],t:a[1],d:a[2],dims:d,ai:a[4],why:a[5],yrs:a[6],progs:a[7],note:a[8]||"",der:(a[9]||"").split("|").filter(Boolean).map(x=>{const p=x.split(":");return{t:p[0],ai:p[1]}})}});
+const J=Object.fromEntries(JOBS.map(j=>[j.id,j]));
+/* Préalables du DEC : "SN" = cours de sciences de la nature (biologie, chimie, physique, maths) ·
+   "M" = mathématiques (profil maths de Sciences humaines) · "0" = aucun préalable particulier */
+const PREQ={gciv:"SN",gmec:"SN",gele:"SN",glog:"SN",gbio:"SN",gchi:"SN",gaer:"SN",gmin:"SN",gind:"SN",gmat:"SN",gphys:"SN",grob:"SN",gbat:"SN",geau:"SN",galim:"SN",arp:"SN",
+ med:"SN",den:"SN",pha:"SN",opt:"SN",vet:"SN",phy:"SN",erg:"SN",inf:"SN",ips:"SN",nut:"SN",aud:"SN",chir:"SN",podo:"SN",sf:"SN",kin:"SN",eps:"SN",
+ bio:"SN",bch:"SN",mic:"SN",pharmaco:"SN",neuro:"SN",bioinf:"SN",fors:"SN",chim:"SN",phys:"SN",geol:"SN",ocean:"SN",met:"SN",env:"SN",agr:"SN",for:"SN",
+ act:"M",dat:"M",dev:"M",cyb:"M",eco:"M",cpa:"M",fin:"M",gestion:"M",mkt:"M",demo:"M",arch:"M"};
+JOBS.forEach(j=>j.progs.forEach(p=>{if(!p[2])p[2]=PREQ[j.id]||"0"}));
+const DEC_LBL={sn:"Sciences de la nature",shm:"Sciences humaines avec mathématiques",sh:"Sciences humaines sans mathématiques"};
+function okPre(code){const d=st.dec||"sn";return code==="0"||d==="sn"||(code==="M"&&d==="shm")}
+function jobOpen(j){return j.progs.some(p=>okPre(p[2]))}
+const AI_LBL={F:"Exposition à l'IA : faible",M:"Exposition à l'IA : modérée",E:"Exposition à l'IA : élevée"};
+const AI_SHORT={F:"Faible",M:"Modérée",E:"Élevée"};
+const YRS_LBL={1:"3 à 4 ans d'université",2:"5 à 6 ans d'université",3:"7 ans et plus d'université"};
+
+/* Programme d'entrée le plus accessible pour un métier (premier programme de la liste = entrée) */
+function bestEntry(j){
+ const entry=j.id==="ips"?[j.progs[0]]:j.progs;
+ const pick=list=>{let best=null;list.forEach(p=>{for(const u in p[1]){const e=effR(p[1][u]);if(e!=null&&(best==null||e<best.e))best={e,u,v:p[1][u]}}});return best};
+ const open=entry.filter(p=>okPre(p[2]));
+ if(open.length){const b=pick(open);return b?Object.assign(b,{app:false}):null}
+ const b=pick(entry);return b?Object.assign(b,{app:true}):{app:true,e:null};
+}
+const GATE={orth:"maîtrise",aud:"maîtrise",psy:"doctorat",ips:"maîtrise IPS"};
+function status(j){
+ const b=bestEntry(j);
+ if(b&&b.app)return{cls:"app",lbl:"Cours d'appoint requis"};
+ if(GATE[j.id]&&(!b||b.e<=CR()+0.5))return{cls:"tight",lbl:(GATE[j.id]==="doctorat"?"Sélection au doctorat":"Sélection à la "+GATE[j.id])};
+ if(!b||b.e==null)return{cls:"na",lbl:"Sur dossier"};
+ const d=b.e-CR();
+ return d<=-1?{cls:"ok",lbl:"À ta portée"}:d<=0.5?{cls:"tight",lbl:"Serré"}:{cls:"hi",lbl:"Hors de portée pour l'instant"};
+}
+
+/* ---------- Réalités du travail (pour les questions de filtrage) ----------
+ [milieux, sang/blessures 0-3, horaires atypiques 0-3, urgence 0-3, pratique autonome possible 0/1]
+ milieux : h hôpital/clinique · b bureau · l laboratoire · x plein air/terrain · e école
+*/
+const ATTR={
+ gciv:["bx",0,0,1,0],gmec:["bl",0,0,0,0],gele:["bx",0,1,0,0],glog:["b",0,0,0,0],gbio:["hl",1,0,0,0],gchi:["lb",0,1,0,0],
+ gaer:["bl",0,0,0,0],gmin:["x",0,2,1,0],gind:["bx",0,0,0,0],gmat:["l",0,0,0,0],gphys:["l",0,0,0,0],grob:["lb",0,0,0,0],
+ gbat:["bx",0,0,0,0],geau:["xb",0,0,1,0],galim:["lb",0,1,0,0],arp:["x",0,0,0,1],
+ med:["h",3,3,3,1],den:["h",2,0,1,1],pha:["h",0,1,1,1],opt:["h",1,0,0,1],vet:["h",3,1,2,1],phy:["h",1,0,0,1],
+ erg:["he",0,0,0,1],inf:["h",3,3,3,0],ips:["h",2,1,2,0],nut:["h",0,0,0,1],orth:["he",0,0,0,1],aud:["h",0,0,0,1],
+ chir:["h",0,0,0,1],podo:["h",2,0,0,1],sf:["h",3,3,3,1],kin:["hx",0,0,0,1],eps:["ex",0,0,0,0],psy:["hb",0,0,1,1],
+ psyed:["eh",0,1,2,0],co:["eb",0,0,0,1],
+ bio:["xl",0,0,0,0],bch:["l",1,0,0,0],mic:["l",1,0,0,0],pharmaco:["l",1,0,0,0],neuro:["l",1,0,0,0],bioinf:["b",0,0,0,0],
+ fors:["lx",2,1,2,0],chim:["l",0,0,0,0],phys:["lb",0,0,0,0],geol:["x",0,1,0,0],ocean:["xl",0,1,0,0],met:["b",0,2,1,0],
+ act:["b",0,0,0,0],dat:["b",0,0,0,0],dev:["b",0,0,0,0],cyb:["b",0,1,2,0],sig:["bx",0,0,0,0],env:["xb",0,0,0,1],
+ agr:["x",0,0,0,1],for:["x",0,1,1,0],
+ arch:["b",0,0,0,1],urb:["b",0,0,0,0],des:["bl",0,0,0,1],esec:["e",0,0,1,0],epri:["e",0,0,1,0],ada:["e",0,0,1,0],
+ ts:["hb",0,1,2,0],crim:["b",0,1,1,0],rh:["b",0,0,0,0],eco:["b",0,0,0,0],cpa:["b",0,0,0,1],fin:["b",0,0,0,0],
+ avo:["b",0,0,2,1],not:["b",0,0,0,1],
+ journ:["bx",0,2,2,0],comm:["b",0,0,1,0],mkt:["b",0,0,0,0],gestion:["b",0,0,1,1],polsci:["b",0,1,1,0],ri:["b",0,0,1,0],
+ hist:["b",0,0,0,0],anthro:["bx",0,0,0,0],ling:["b",0,0,0,0],trad:["b",0,0,0,1],sexo:["hb",0,0,0,1],loisir:["xb",0,2,0,0],
+ intsport:["x",0,1,0,0],pubadmin:["b",0,0,0,0],secur:["bx",0,2,2,0],museo:["b",0,0,0,0],esecsh:["e",0,0,1,0],demo:["b",0,0,0,0],redac:["b",0,0,0,1]
+};
+
+/* ---------- Questionnaire ---------- */
+const SETTINGS=["h","b","l","x","e",null];
+const Q=[
+ {k:"H",t:"Aider directement des personnes à régler leurs problèmes, ça me motive."},
+ {k:"S",t:"Le corps humain, la santé et le fonctionnement du vivant me fascinent."},
+ {k:"T",t:"Je préfère bouger et travailler sur le terrain plutôt que de passer toute la journée derrière un bureau."},
+ {k:"L",t:"Faire des expériences et comprendre le « pourquoi » des choses m'allume."},
+ {k:"I",t:"J'aime programmer ou résoudre des problèmes à l'ordinateur."},
+ {k:"C",t:"J'aime concevoir, construire ou comprendre comment fonctionnent les machines et les structures."},
+ {k:"N",t:"L'environnement, les animaux et la nature me tiennent à cœur."},
+ {k:"E",t:"Expliquer quelque chose et voir quelqu'un finalement comprendre, j'adore ça."},
+ {k:"M",t:"Les chiffres, les statistiques et la finance m'intéressent."},
+ {k:"D",t:"J'ai besoin de créer, de dessiner ou d'imaginer des solutions originales."},
+ {k:"J",t:"Les lois, les règles et la justice sociale m'interpellent."},
+ {k:"R",t:"Écrire, argumenter et débattre de mes idées, ça me plaît."},
+ {k:"G",t:"L'actualité, la politique et les autres cultures me passionnent."},
+ {k:"W",t:"Dans quel milieu te vois-tu le plus travailler ?",opts:["À l'hôpital ou en clinique","Dans un bureau","Dans un laboratoire","Dehors ou sur le terrain","Dans une école","Un mélange, ça me va"]},
+ {k:"B",t:"Voir du sang, des blessures ou des personnes très malades ne me dérange pas."},
+ {k:"O",t:"Travailler de soir, de nuit, la fin de semaine ou sur appel ne me dérange pas."},
+ {k:"U",t:"J'aime les situations urgentes où il faut garder son calme et agir vite."},
+ {k:"P",t:"Comment préfères-tu travailler ?",opts:["Au sein d'une grande équipe","Un peu des deux","De façon autonome, peut-être avec ma propre pratique ou entreprise"]}
+];
+const SCALE=["Pas du tout","Peu","Neutre","Assez","Tout à fait"];
+const FIRST=30, STEP=15, BATCH=25;
+
+/* ---------- Onglet « Métiers en vrac » : ~200 métiers exigeant un baccalauréat ----------
+ [titre, description, métier du parcours guidé auquel il se rattache (même formation)]
+*/
+const EXTRA=[
+["Gestionnaire de projets de construction","Coordonner les échéanciers, les budgets et les équipes d'un grand chantier.","gciv"],
+["Ingénieur·e en structures","Calculer la résistance des ponts, des tours et des stades pour qu'ils restent debout.","gciv"],
+["Ingénieur·e en transport","Planifier les routes, le transport en commun et la circulation dans les villes.","gciv"],
+["Ingénieur·e municipal·e","Gérer les infrastructures d'une ville : aqueducs, rues, parcs.","gciv"],
+["Ingénieur·e en énergie renouvelable","Concevoir des éoliennes, des panneaux solaires ou des systèmes géothermiques.","gmec"],
+["Ingénieur·e en véhicules électriques","Développer les batteries, les moteurs et les systèmes des autobus et voitures électriques.","gmec"],
+["Ingénieur·e en fabrication additive","Mettre au point des pièces fabriquées par impression 3D, du métal au plastique.","gmec"],
+["Ingénieur·e en télécommunications","Concevoir les réseaux cellulaires, les satellites de communication et la fibre optique.","gele"],
+["Ingénieur·e en instrumentation et contrôle","Automatiser et surveiller les équipements des usines et des centrales.","gele"],
+["Architecte de solutions infonuagiques","Concevoir l'infrastructure « nuage » qui fait fonctionner les grandes applications.","glog"],
+["Ingénieur·e en apprentissage automatique","Entraîner et mettre en service des modèles d'intelligence artificielle.","glog"],
+["Chef·fe de produit technologique","Décider quelles fonctions une application doit offrir et coordonner son développement.","glog"],
+["Ingénieur·e clinique en hôpital","Gérer et sécuriser les appareils médicaux d'un hôpital.","gbio"],
+["Spécialiste des affaires réglementaires","Faire approuver des médicaments ou des appareils médicaux par Santé Canada.","gbio"],
+["Concepteur·trice de prothèses","Concevoir des membres artificiels et des orthèses sur mesure.","gbio"],
+["Ingénieur·e en procédés pharmaceutiques","Organiser la fabrication à grande échelle des médicaments et des vaccins.","gchi"],
+["Ingénieur·e en batteries et hydrogène","Développer les technologies de stockage d'énergie de demain.","gchi"],
+["Ingénieur·e spatial·e","Concevoir des satellites, des robots spatiaux ou des instruments pour l'espace.","gaer"],
+["Ingénieur·e en essais en vol","Planifier et analyser les vols d'essai de nouveaux avions.","gaer"],
+["Ingénieur·e géotechnique","Étudier les sols avant de construire un barrage, une route ou un édifice.","gmin"],
+["Spécialiste en restauration de sites miniers","Remettre la nature en état après la fermeture d'une mine.","gmin"],
+["Ingénieur·e en santé et sécurité du travail","Prévenir les accidents dans les usines et sur les chantiers.","gind"],
+["Spécialiste en chaîne d'approvisionnement","Organiser le trajet des produits, de l'usine jusqu'au client.","gind"],
+["Métallurgiste","Développer des alliages de métaux plus légers et plus résistants.","gmat"],
+["Ingénieur·e en photonique","Concevoir des lasers et des technologies qui utilisent la lumière.","gphys"],
+["Spécialiste en technologies quantiques","Participer au développement des ordinateurs et des capteurs quantiques.","gphys"],
+["Ingénieur·e en vision artificielle","Apprendre aux machines à « voir » et à reconnaître des objets.","grob"],
+["Ingénieur·e en drones et véhicules autonomes","Concevoir des véhicules qui se déplacent sans pilote.","grob"],
+["Consultant·e en efficacité énergétique","Aider des entreprises et des édifices à consommer moins d'énergie.","gbat"],
+["Hydrologue","Étudier les rivières et les lacs pour prévoir les crues et les sécheresses.","geau"],
+["Spécialiste des risques d'inondation","Cartographier les zones inondables et protéger les communautés.","geau"],
+["Spécialiste en salubrité alimentaire","Veiller à ce que les aliments produits soient sans danger.","galim"],
+["Développeur·euse de produits alimentaires","Inventer de nouveaux aliments, de la recette à la production en usine.","galim"],
+["Spécialiste en cartographie par drone","Produire des cartes et des modèles 3D à partir d'images de drones.","arp"],
+["Spécialiste en jumeaux numériques","Créer des copies virtuelles de villes ou d'usines pour les simuler.","arp"],
+["Chirurgien·ne","Opérer des patients pour réparer, retirer ou remplacer des organes et des tissus.","med"],
+["Médecin urgentologue","Traiter des patients en situation critique à l'urgence.","med"],
+["Pédiatre","Soigner les bébés, les enfants et les adolescents.","med"],
+["Psychiatre","Diagnostiquer et traiter les maladies mentales, y compris avec des médicaments.","med"],
+["Médecin de famille","Suivre la santé de patients de tous âges pendant des années.","med"],
+["Radiologiste","Interpréter les radiographies, les scanners et les IRM.","med"],
+["Anesthésiologiste","Endormir les patients et surveiller leurs signes vitaux pendant les opérations.","med"],
+["Médecin en santé publique","Protéger la santé de toute une population : épidémies, vaccination, prévention.","med"],
+["Orthodontiste","Corriger la position des dents et des mâchoires.","den"],
+["Pharmacien·ne d'hôpital","Ajuster les traitements des patients hospitalisés avec l'équipe médicale.","pha"],
+["Pharmacien·ne en recherche clinique","Participer aux essais de nouveaux médicaments.","pha"],
+["Vétérinaire de zoo ou de la faune","Soigner des animaux sauvages ou exotiques.","vet"],
+["Vétérinaire en inspection des aliments","Surveiller la santé des animaux d'élevage et la sécurité de la viande.","vet"],
+["Physiothérapeute du sport","Soigner et prévenir les blessures des athlètes.","phy"],
+["Ergothérapeute en pédiatrie","Aider des enfants à développer leur autonomie à l'école et à la maison.","erg"],
+["Ergonome","Adapter les postes de travail pour prévenir les blessures.","erg"],
+["Infirmier·ère à l'urgence","Évaluer et soigner rapidement les patients qui arrivent à l'urgence.","inf"],
+["Infirmier·ère en région nordique","Offrir des soins dans des communautés éloignées, avec beaucoup d'autonomie.","inf"],
+["Infirmier·ère en soins intensifs","Surveiller et soigner des patients dans un état critique.","inf"],
+["Infirmier·ère en santé publique","Faire de la prévention et de la vaccination dans la communauté.","inf"],
+["Nutritionniste du sport","Aider les athlètes à optimiser leur alimentation pour performer.","nut"],
+["Orthophoniste scolaire","Aider les élèves qui ont des difficultés de langage ou de lecture.","orth"],
+["Préparateur·trice physique d'athlètes","Entraîner des athlètes pour améliorer leur force, leur vitesse et leur endurance.","kin"],
+["Kinésiologue en réadaptation cardiaque","Aider des personnes à reprendre l'activité physique après un problème cardiaque.","kin"],
+["Entraîneur·e sportif·ve","Diriger l'entraînement d'une équipe ou d'athlètes de haut niveau.","intsport"],
+["Neuropsychologue","Évaluer la mémoire, l'attention et les autres fonctions du cerveau.","psy"],
+["Psychologue du sport","Aider les athlètes à gérer la pression et à performer mentalement.","psy"],
+["Psychologue du travail","Améliorer le bien-être et le fonctionnement des équipes en entreprise.","psy"],
+["Psychologue scolaire","Évaluer et soutenir les élèves en difficulté à l'école.","psy"],
+["Intervenant·e en centre jeunesse","Accompagner au quotidien des adolescents en difficulté.","psyed"],
+["Conseiller·ère en information scolaire","Renseigner les élèves sur les programmes d'études et les métiers.","co"],
+["Biologiste de la faune","Suivre les populations d'animaux sauvages pour les protéger.","bio"],
+["Biologiste en conservation","Protéger les espèces menacées et leurs habitats.","bio"],
+["Naturaliste-interprète en parc national","Faire découvrir la nature aux visiteurs d'un parc.","bio"],
+["Consultant·e en évaluation environnementale","Mesurer l'impact d'un projet sur la nature avant sa construction.","bio"],
+["Associé·e de recherche clinique","Organiser et surveiller les essais de nouveaux traitements sur des patients.","bch"],
+["Spécialiste en biotechnologie","Utiliser des cellules ou des micro-organismes pour créer des produits utiles.","bch"],
+["Conseiller·ère en génétique","Expliquer aux familles les résultats de tests génétiques.","bch"],
+["Spécialiste en prévention des infections","Empêcher la propagation des infections dans les hôpitaux.","mic"],
+["Virologue","Étudier les virus pour mieux les combattre.","mic"],
+["Toxicologue","Évaluer les effets des produits chimiques et des médicaments sur la santé.","pharmaco"],
+["Spécialiste en interfaces cerveau-machine","Relier le cerveau à des ordinateurs ou à des prothèses.","neuro"],
+["Spécialiste en génomique","Analyser l'ADN pour mieux diagnostiquer et traiter les maladies.","bioinf"],
+["Expert·e en scène de crime","Recueillir et analyser les indices sur les lieux d'un crime.","fors"],
+["Chimiste en cosmétiques","Développer des crèmes, du maquillage et des produits de soins.","chim"],
+["Chimiste en environnement","Mesurer et réduire la pollution de l'eau, de l'air et des sols.","chim"],
+["Physicien·ne médical·e","Planifier les traitements de radiothérapie contre le cancer.","phys"],
+["Astronome","Observer et étudier les étoiles, les planètes et les galaxies.","phys"],
+["Analyste quantitatif·ve","Utiliser les mathématiques pour concevoir des stratégies financières.","phys"],
+["Hydrogéologue","Trouver et protéger l'eau souterraine.","geol"],
+["Sismologue","Étudier les tremblements de terre et l'intérieur de la planète.","geol"],
+["Biologiste marin·e","Étudier les baleines, les poissons et les écosystèmes marins.","ocean"],
+["Climatologue","Étudier l'évolution du climat et ses impacts à long terme.","met"],
+["Spécialiste en adaptation aux changements climatiques","Aider les villes et les entreprises à se préparer au climat de demain.","met"],
+["Gestionnaire de risques","Repérer et réduire les risques financiers d'une entreprise.","act"],
+["Ingénieur·e en intelligence artificielle","Construire des systèmes d'IA pour des entreprises ou la recherche.","dat"],
+["Analyste sportif·ve","Utiliser les statistiques pour aider une équipe sportive à gagner.","dat"],
+["Épidémiologiste","Étudier comment les maladies se propagent dans la population.","dat"],
+["Développeur·euse de jeux vidéo","Programmer les mécaniques et les mondes des jeux vidéo.","dev"],
+["Concepteur·trice de jeux vidéo","Imaginer les règles, les niveaux et l'expérience d'un jeu.","dev"],
+["Développeur·euse d'applications mobiles","Créer des applications pour téléphones et tablettes.","dev"],
+["Hacker éthique","Attaquer des systèmes informatiques, avec permission, pour trouver leurs failles.","cyb"],
+["Enquêteur·euse en cybercriminalité","Retracer les auteurs de fraudes et d'attaques en ligne.","cyb"],
+["Spécialiste en télédétection","Analyser des images satellites pour suivre les forêts, les glaces ou les villes.","sig"],
+["Cartographe","Concevoir des cartes claires et précises, papier ou numériques.","sig"],
+["Spécialiste en développement durable","Aider une entreprise à réduire son empreinte environnementale.","env"],
+["Inspecteur·trice environnemental·e","Vérifier que les entreprises respectent les lois sur l'environnement.","env"],
+["Spécialiste en agriculture urbaine","Faire pousser des aliments en ville : serres, toits, fermes verticales.","agr"],
+["Spécialiste des feux de forêt","Prévoir, prévenir et combattre les incendies de forêt.","for"],
+["Architecte paysagiste","Concevoir des parcs, des places publiques et des jardins.","arch"],
+["Designer d'intérieur","Aménager des espaces intérieurs beaux et fonctionnels.","arch"],
+["Architecte en patrimoine","Restaurer et protéger des bâtiments historiques.","arch"],
+["Planificateur·trice des transports","Organiser les réseaux d'autobus, de métro et de pistes cyclables.","urb"],
+["Designer UX","Rendre les applications et les sites web simples et agréables à utiliser.","des"],
+["Designer d'équipements sportifs","Concevoir des skis, des casques ou des vélos plus performants.","des"],
+["Designer graphique","Créer l'identité visuelle, les affiches et les interfaces des marques.","des"],
+["Enseignant·e au cégep","Enseigner une matière spécialisée à des étudiants du collégial.","esec"],
+["Conseiller·ère pédagogique","Aider les enseignants à améliorer leurs méthodes.","esec"],
+["Concepteur·trice pédagogique","Créer des formations en ligne et du matériel éducatif.","esec"],
+["Direction d'école","Diriger une école, son équipe et ses projets.","epri"],
+["Orthopédagogue","Aider individuellement des élèves ayant des troubles d'apprentissage.","ada"],
+["Organisateur·trice communautaire","Mobiliser les citoyens autour de projets pour leur quartier.","ts"],
+["Intervenant·e en protection de la jeunesse","Évaluer et protéger des enfants en situation de danger.","ts"],
+["Travailleur·euse social·e en hôpital","Aider les patients et leurs familles à affronter la maladie.","ts"],
+["Agent·e de probation","Accompagner des personnes contrevenantes vers la réinsertion.","crim"],
+["Analyste en renseignement criminel","Analyser des données pour aider la police à démanteler des réseaux.","crim"],
+["Agent·e de renseignement","Recueillir et analyser de l'information liée à la sécurité nationale.","crim"],
+["Recruteur·euse","Trouver et attirer les bonnes personnes pour une entreprise.","rh"],
+["Conseiller·ère en relations de travail","Négocier et gérer les conventions collectives entre employeurs et syndicats.","rh"],
+["Analyste en politiques publiques","Évaluer les programmes du gouvernement et proposer des améliorations.","polsci"],
+["Diplomate","Représenter le Canada à l'étranger et négocier avec d'autres pays.","ri"],
+["Spécialiste en développement international","Gérer des projets d'aide dans des pays en développement.","ri"],
+["Juricomptable","Enquêter sur des fraudes financières à l'aide de la comptabilité.","cpa"],
+["Fiscaliste","Conseiller des personnes et des entreprises sur leurs impôts.","cpa"],
+["Auditeur·trice","Vérifier que les états financiers d'une organisation sont exacts.","cpa"],
+["Conseiller·ère en finance durable","Diriger les investissements vers des entreprises responsables.","fin"],
+["Planificateur·trice financier·ère","Aider des familles à planifier leurs finances et leur retraite.","fin"],
+["Gestionnaire de portefeuille","Gérer des placements pour des clients ou des fonds.","fin"],
+["Procureur·e aux poursuites criminelles","Représenter l'État dans les procès criminels.","avo"],
+["Juriste en environnement","Faire respecter et évoluer les lois qui protègent l'environnement.","avo"],
+["Juriste en propriété intellectuelle","Protéger les inventions, les marques et les créations.","avo"],
+["Médiateur·trice familial·e","Aider des couples qui se séparent à s'entendre, surtout pour les enfants.","not"],
+["Journaliste d'enquête","Fouiller pendant des mois pour révéler des scandales ou des injustices.","journ"],
+["Recherchiste télé ou radio","Trouver les sujets, les invités et l'information pour une émission.","journ"],
+["Journaliste sportif·ve","Couvrir les matchs, les athlètes et les coulisses du sport.","journ"],
+["Relationniste de presse","Gérer les relations entre une organisation et les médias.","comm"],
+["Gestionnaire de médias sociaux","Animer les réseaux sociaux d'une marque ou d'un organisme.","comm"],
+["Porte-parole","Représenter publiquement une organisation, surtout en situation de crise.","comm"],
+["Stratège en publicité","Concevoir des campagnes publicitaires qui marquent les esprits.","mkt"],
+["Analyste en études de marché","Sonder les consommateurs pour comprendre ce qu'ils veulent.","mkt"],
+["Gestionnaire de marque","Développer l'image et la réputation d'un produit connu.","mkt"],
+["Entrepreneur·e","Lancer et faire grandir sa propre entreprise.","gestion"],
+["Gestionnaire des opérations","Faire tourner efficacement une usine, un magasin ou un service.","gestion"],
+["Consultant·e en management","Aider des entreprises à résoudre leurs problèmes d'organisation.","gestion"],
+["Attaché·e politique","Conseiller un ou une élu·e et préparer ses dossiers.","polsci"],
+["Relationniste gouvernemental·e","Représenter une organisation auprès des gouvernements.","polsci"],
+["Travailleur·euse humanitaire","Coordonner l'aide dans des zones de crise ou de catastrophe.","ri"],
+["Analyste en sécurité internationale","Étudier les conflits et les menaces entre pays.","ri"],
+["Archiviste","Classer et conserver les documents historiques et administratifs.","hist"],
+["Consultant·e en patrimoine","Protéger et mettre en valeur des lieux et des objets historiques.","hist"],
+["Archéologue","Fouiller des sites pour découvrir comment vivaient les peuples du passé.","anthro"],
+["Consultant·e en diversité et inclusion","Aider les organisations à devenir plus inclusives.","anthro"],
+["Chercheur·e en opinion publique","Concevoir et analyser des sondages sur ce que pense la population.","anthro"],
+["Terminologue","Créer et normaliser le vocabulaire spécialisé d'un domaine.","ling"],
+["Spécialiste du traitement automatique des langues","Apprendre aux ordinateurs à comprendre et produire du langage.","ling"],
+["Interprète de conférence","Traduire oralement, en direct, lors de réunions internationales.","trad"],
+["Spécialiste en localisation de jeux vidéo","Adapter des jeux vidéo à la langue et à la culture d'un pays.","trad"],
+["Éducateur·trice à la sexualité","Animer des ateliers sur la sexualité et les relations saines dans les écoles.","sexo"],
+["Gestionnaire d'événements","Organiser des festivals, des congrès ou des spectacles.","loisir"],
+["Coordonnateur·trice d'un centre culturel","Programmer des activités et des spectacles pour une communauté.","loisir"],
+["Gestionnaire en tourisme d'aventure","Créer et gérer des expéditions et des séjours en nature.","loisir"],
+["Coordonnateur·trice des sports","Organiser les programmes sportifs d'une école, d'une ville ou d'une fédération.","intsport"],
+["Guide en plein air","Encadrer des groupes en canot, en randonnée ou en expédition.","intsport"],
+["Direction générale d'une municipalité","Diriger l'administration et les services d'une ville.","pubadmin"],
+["Agent·e de programmes gouvernementaux","Concevoir et gérer des programmes d'aide au gouvernement.","pubadmin"],
+["Enquêteur·euse en fraude","Enquêter sur des fraudes pour une banque, un assureur ou un gouvernement.","secur"],
+["Gestionnaire des mesures d'urgence","Préparer une ville ou une organisation à faire face aux catastrophes.","secur"],
+["Commissaire d'exposition","Choisir les œuvres et concevoir le propos d'une exposition.","museo"],
+["Médiateur·trice culturel·le","Créer des activités pour rapprocher le public de l'art et de la culture.","museo"],
+["Enseignant·e d'histoire","Faire vivre l'histoire et la géographie aux élèves du secondaire.","esecsh"],
+["Enseignant·e de français","Enseigner la langue et la littérature aux adolescents.","esecsh"],
+["Enseignant·e d'anglais langue seconde","Aider les élèves à apprendre l'anglais.","esecsh"],
+["Démographe","Étudier l'évolution de la population : naissances, migrations, vieillissement.","demo"],
+["Scénariste","Écrire des histoires pour le cinéma, la télévision ou les jeux vidéo.","redac"],
+["Réviseur·e linguistique","Corriger et améliorer des textes avant leur publication.","redac"],
+["Rédacteur·trice technique","Écrire des guides et des modes d'emploi clairs.","redac"],
+["Auteur·e","Écrire des romans, des essais ou des livres jeunesse.","redac"],
+["Journaliste scientifique","Expliquer la science et la santé au grand public.","journ"],
+["Muséologue scientifique","Concevoir des expositions dans des musées de science.","museo"],
+["Gestionnaire de projets","Planifier et coordonner des projets complexes du début à la fin.","gestion"],
+["Professeur·e d'université","Faire de la recherche et enseigner à l'université (doctorat requis).",""]
+];
+
+/* ---------- État et stockage ---------- */
+const KEY="boussole-metiers-v4";
+function fresh(){return{tab:"g",v:{order:[],i:0,r:{},cont:true},step:"welcome",qi:0,ans:{},order:[],scores:{},shown:FIRST,ti:0,tri:{},duel:null,final:null,extra:[],cr:null,dec:null}}
+function load(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):null}catch(e){return null}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+let st=Object.assign(fresh(),load()||{});
+
+/* ---------- Calcul des correspondances ---------- */
+function computeOrder(){
+ const A=st.ans, w=SETTINGS[A.W??5], P=A.P??1;
+ JOBS.forEach(j=>{
+  let num=0,den=0;
+  for(const k in j.dims){const v=(A[k]??3)-3;num+=v*j.dims[k];den+=j.dims[k]}
+  let s=den?num/den:0;
+  const [set,bl,od,ur,pr]=ATTR[j.id]||["",0,0,0,0];
+  if(w)s+=set.includes(w)?0.5:-0.2;
+  if(bl)s+=((A.B??3)-3)*0.35*bl;
+  if(od)s+=((A.O??3)-3)*0.25*od;
+  if(ur)s+=((A.U??3)-3)*0.25*ur;
+  if(P===2&&pr)s+=0.3;
+  if(P===0)s+=pr?-0.2:0.1;
+  if(!jobOpen(j))s-=0.4;
+  st.scores[j.id]=+s.toFixed(3);
+ });
+ st.order=JOBS.map(j=>j.id).sort((a,b)=>st.scores[b]-st.scores[a]);
+}
+
+/* ---------- Rendu ---------- */
+const app=document.getElementById("app");
+const STEPS=["Questions","Tri","Duels","Résultats"];
+function trail(i){return`<div class="trail" aria-hidden="true">${STEPS.map((_,n)=>`<span class="${n<i?"on":n===i?"now":""}"></span>`).join("")}</div><p class="trail-label">Étape ${i+1} de 4 : ${STEPS[i]}</p>`}
+function tags(j,noY){return`<div class="facts"><span class="tag"><span class="dot ai-${j.ai}"></span>${AI_LBL[j.ai]}</span>${noY?"":`<span class="tag">${YRS_LBL[j.yrs]}</span>`}</div><p class="why">${j.why}</p>`}
+
+function draw(){
+ if(st.tab==="v")return rVrac();
+ if(st.tab==="c")return rCombo();
+ const s=st.step;
+ if(s==="welcome")return rWelcome();
+ if(s==="setup")return rSetup();
+ if(s==="quiz")return rQuiz();
+ if(s==="triage")return rTriage();
+ if(s==="triageDone")return rTriageDone();
+ if(s==="duel")return rDuel();
+ if(s==="results")return rResults();
+}
+function render(){
+ save();draw();
+ const old=app.querySelector(".tabs");if(old)old.remove();
+ app.insertAdjacentHTML("afterbegin",tabsBar());
+ app.querySelectorAll(".tabs [data-tab]").forEach(b=>b.onclick=()=>{st.tab=b.dataset.tab;render();window.scrollTo(0,0)});
+}
+function rWelcome(){
+ app.innerHTML=`
+ <h1>Trouve le métier qui te ressemble.</h1>
+ <p class="lede">Ici, on part des métiers, pas des programmes. Tu choisis d'abord ce qui t'allume; le chemin universitaire vient à la fin.</p>
+ <ol class="steps-intro">
+  <li><div><b>Ton programme, ta cote R, puis 18 questions rapides</b><span>Sur tes intérêts et sur la réalité du travail qui te convient, pour repérer les métiers qui te ressemblent parmi ${JOBS.length}.</span></div></li>
+  <li><div><b>Un tri express</b><span>Oui, peut-être ou non, un métier à la fois. On commence par les ${FIRST} qui te ressemblent le plus.</span></div></li>
+  <li><div><b>Des duels</b><span>Deux métiers, tu choisis celui qui te ressemble le plus. On répète jusqu'à obtenir ton classement.</span></div></li>
+  <li><div><b>Ton top 10</b><span>Avec la cote R, l'exposition à l'IA, les métiers connexes et les universités, du plus proche au plus loin de Saint-Jérôme.</span></div></li>
+ </ol>
+ <p>Compte environ 15 minutes. Ta progression est sauvegardée : tu peux fermer la page et revenir. L'onglet « Métiers en vrac » propose ensuite une autre approche, sans questions.</p>
+ <div class="row"><button class="btn" id="go">Commencer</button></div>`;
+ go.onclick=()=>{st.step="setup";render()};
+}
+
+function rSetup(){
+ app.innerHTML=`${trail(0)}<h2>Avant de commencer</h2>
+ <p class="qcount">Ton programme au cégep</p>
+ <div class="choices" id="decs">${Object.entries(DEC_LBL).map(([k,l])=>`<button data-d="${k}" class="${st.dec===k?"sel":""}">${l}</button>`).join("")}</div>
+ <div class="crbox"><label for="crS"><b>Ta cote R actuelle</b></label>
+  <input id="crS" type="number" inputmode="decimal" step="0.1" min="15" max="40" placeholder="ex. 28,5" value="${st.cr!=null?st.cr.toFixed(1):""}">
+  <small>Une estimation suffit. Tu pourras la modifier dans les résultats.</small></div>
+ <div class="row"><button class="btn" id="setGo" ${st.dec?"":"disabled"}>Continuer</button></div>
+ <p class="kbd" id="setMsg"></p>`;
+ const inp=document.getElementById("crS");
+ const readCr=()=>{const v=parseFloat(String(inp.value).replace(",","."));return(!isNaN(v)&&v>=15&&v<=40)?v:null};
+ app.querySelectorAll("#decs [data-d]").forEach(b=>b.onclick=()=>{const c=readCr();if(c!=null)st.cr=c;st.dec=b.dataset.d;render()});
+ setGo.onclick=()=>{const c=readCr();if(c==null){document.getElementById("setMsg").textContent="Entre une cote R entre 15 et 40 (une estimation suffit).";inp.focus();return}st.cr=c;st.step="quiz";st.qi=0;render()};
+}
+function rQuiz(){
+ const q=Q[st.qi], cur=st.ans[q.k];
+ const body=q.opts
+  ?`<div class="choices">${q.opts.map((o,i)=>`<button data-v="${i}" class="${cur===i?"sel":""}">${o}</button>`).join("")}</div>`
+  :`<div class="scale">${SCALE.map((o,i)=>`<button data-v="${i+1}" class="${cur===i+1?"sel":""}" aria-label="${o}"><i>${i+1}</i>${o}</button>`).join("")}</div>`;
+ app.innerHTML=`${trail(0)}<div class="qcount">Question ${st.qi+1} sur ${Q.length}</div><p class="qtext">${q.t}</p>${body}
+ <button class="back" id="bk">${st.qi>0?"Question précédente":"Revenir au programme et à la cote R"}</button>
+ ${q.opts?"":`<p class="kbd">Astuce : tu peux aussi répondre avec les touches 1 à 5.</p>`}`;
+ app.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>answer(+b.dataset.v));
+ bk.onclick=()=>{if(st.qi>0)st.qi--;else st.step="setup";render()};
+}
+function answer(v){
+ st.ans[Q[st.qi].k]=v; st.qi++;
+ if(st.qi>=Q.length){computeOrder();st.step="triage";st.ti=0;st.tri={};st.shown=FIRST}
+ render();
+}
+
+function triList(){return st.order.slice(0,st.shown)}
+function rTriage(){
+ const list=triList();
+ if(st.ti>=list.length){st.step="triageDone";return render()}
+ const j=J[list[st.ti]];
+ app.innerHTML=`${trail(1)}
+ <div class="meta-line"><span>Métier ${st.ti+1} sur ${list.length}</span><span>${Object.values(st.tri).filter(v=>v==="y").length} coup(s) de cœur</span></div>
+ <div class="card"><div class="jt">${j.t}</div><p style="margin:0">${j.d}</p>${tags(j,1)}
+  ${j.der.length?`<p class="also"><b>Avec la même formation, on peut aussi devenir :</b> ${j.der.map(x=>x.t).join(", ")}.</p>`:""}
+ </div>
+ <div class="tri">
+  <button class="y" data-v="y">Ça m'intéresse<small>touche →</small></button>
+  <button class="m" data-v="m">Peut-être<small>touche ↓</small></button>
+  <button class="n" data-v="n">Pas pour moi<small>touche ←</small></button>
+ </div>
+ ${st.ti>0?`<button class="back" id="bk">Revenir au métier précédent</button>`:""}`;
+ app.querySelectorAll(".tri [data-v]").forEach(b=>b.onclick=()=>triage(b.dataset.v));
+ if(st.ti>0)bk.onclick=()=>{st.ti--;render()};
+}
+function triage(v){const list=triList();if(st.ti>=list.length)return;st.tri[list[st.ti]]=v;st.ti++;render()}
+
+function rTriageDone(){
+ const y=Object.keys(st.tri).filter(k=>st.tri[k]==="y"), m=Object.keys(st.tri).filter(k=>st.tri[k]==="m");
+ const more=st.order.length-st.shown;
+ const canDuel=y.length+m.length>0;
+ app.innerHTML=`${trail(1)}
+ <h2>${y.length} coup${y.length>1?"s":""} de cœur, ${m.length} peut-être.</h2>
+ <p class="lede">${canDuel?(y.length>=2?"Tes coups de cœur passeront aux duels.":"Comme tu as moins de deux coups de cœur, tes « peut-être » passeront aussi aux duels.")+(y.length>10?" On garde les 10 qui collent le mieux à tes réponses; les autres resteront visibles dans tes résultats.":""):"Aucun métier retenu pour l'instant. Regarde d'autres métiers ou recommence le tri."}</p>
+ ${more>0?`<p>Il reste ${more} autres métiers, un peu moins alignés avec tes réponses. Ça vaut la peine d'y jeter un œil : une bonne surprise est toujours possible.</p>`:""}
+ <div class="row">
+  <button class="btn" id="toDuel" ${canDuel?"":"disabled"}>Passer aux duels</button>
+  ${more>0?`<button class="btn ghost" id="more">Voir ${Math.min(STEP,more)} métiers de plus</button>`:""}
+  <button class="btn ghost" id="redo">Refaire le tri</button>
+ </div>`;
+ toDuel.onclick=startDuel;
+ if(more>0)document.getElementById("more").onclick=()=>{st.ti=st.shown;st.shown+=STEP;st.step="triage";render()};
+ redo.onclick=()=>{st.tri={};st.ti=0;st.shown=FIRST;st.step="triage";render()};
+}
+
+function estimate(n){let t=0;for(let k=1;k<n;k++)t+=Math.ceil(Math.log2(k+1));return t}
+function startDuel(){
+ const by=v=>st.order.filter(id=>st.tri[id]===v);
+ let pool=by("y"); if(pool.length<2)pool=pool.concat(by("m"));
+ st.extra=pool.slice(10); pool=pool.slice(0,10);
+ if(pool.length===0)return;
+ if(pool.length===1){st.final=pool;st.step="results";return render()}
+ const shuffled=pool.slice().sort(()=>Math.random()-.5);
+ st.duel={sorted:[shuffled[0]],queue:shuffled.slice(1),cur:null,lo:0,hi:0,done:0,total:estimate(pool.length),flip:false};
+ nextInsert();
+}
+function nextInsert(){
+ const d=st.duel;
+ if(!d.queue.length){st.final=d.sorted.slice();st.step="results";st.duel=null;return render()}
+ d.cur=d.queue.shift();d.lo=0;d.hi=d.sorted.length;
+ st.step="duel";render();
+}
+function rDuel(){
+ const d=st.duel, mid=Math.floor((d.lo+d.hi)/2), a=J[d.cur], b=J[d.sorted[mid]];
+ d.flip=Math.random()<.5;
+ const L=d.flip?b:a, R=d.flip?a:b;
+ const pct=Math.min(100,Math.round(100*d.done/Math.max(1,d.total)));
+ const card=(j,side)=>`<button class="pick" data-side="${side}"><span class="jt">${j.t}</span><span class="d">${j.d}</span><span class="tag" style="align-self:flex-start;margin-top:auto"><span class="dot ai-${j.ai}"></span>${AI_LBL[j.ai]}</span></button>`;
+ app.innerHTML=`${trail(2)}
+ <h2>Lequel te ressemble le plus ?</h2>
+ <div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><b style="width:${pct}%"></b></div>
+ <div class="duel">${card(L,"L")}<div class="or">ou</div>${card(R,"R")}</div>
+ <p class="kbd">Environ ${Math.max(0,d.total-d.done)} duel(s) restant(s). Touches ← et → pour choisir. Pas de mauvaise réponse : suis ton instinct.</p>`;
+ app.querySelectorAll(".pick").forEach(p=>p.onclick=()=>duelPick(p.dataset.side));
+}
+function duelPick(side){
+ const d=st.duel; if(!d)return;
+ const mid=Math.floor((d.lo+d.hi)/2);
+ const pickedCur=(side==="L")!==d.flip;
+ if(pickedCur)d.hi=mid;else d.lo=mid+1;
+ d.done++;
+ if(d.lo>=d.hi){d.sorted.splice(d.lo,0,d.cur);nextInsert()}else render();
+}
+
+/* ---------- Résultats ---------- */
+function top10(){
+ const ranked=(st.final||[]).map(id=>({id,dec:true}));
+ const seen=new Set(ranked.map(r=>r.id));
+ const fill=st.extra.concat(st.order.filter(id=>st.tri[id]==="y"),st.order.filter(id=>st.tri[id]==="m"));
+ for(const id of fill){if(ranked.length>=10)break;if(!seen.has(id)){seen.add(id);ranked.push({id,dec:false})}}
+ return ranked;
+}
+function uniList(map){
+ const arr=Object.keys(map).map(id=>({id,n:U[id][0],km:U[id][1],v:map[id]})).sort((a,b)=>a.km-b.km);
+ return`<ul class="unis">${arr.map((u,i)=>`<li class="${i===0?"near":""}"><span>${u.n}${i===0?`<span class="band">le plus proche</span>`:""}</span><span class="cr ${crClass(u.v)}" title="Cote R du dernier admis, automne 2025">${fmtR(u.v)}</span><span class="km">${u.km===0?"sur place":"≈ "+u.km+" km"}</span></li>`).join("")}</ul>`;
+}
+function rResults(){
+ const T=top10();
+ const inTop=new Set(T.map(r=>r.id));
+ const others=st.order.filter(id=>(st.tri[id]==="y")&&!inTop.has(id));
+ app.innerHTML=`${trail(3)}
+ <h2>Ton top ${T.length}</h2>
+ <p class="lede">Classés selon tes duels. Compare la cote R demandée à la tienne et regarde l'exposition à l'IA.</p>
+ <div class="crbox">
+  <label for="decIn"><b>Programme</b></label>
+  <select id="decIn">${Object.entries(DEC_LBL).map(([k,l])=>`<option value="${k}" ${st.dec===k?"selected":""}>${l}</option>`).join("")}</select>
+  <label for="crIn"><b>Ta cote R</b></label>
+  <input id="crIn" type="number" inputmode="decimal" step="0.1" min="15" max="40" value="${CR().toFixed(1)}">
+  <small>Elle évolue jusqu'à la fin du DEC : essaie quelques valeurs pour voir ce qui change.</small>
+ </div>
+ <div class="tblwrap"><table class="top">
+  <thead><tr><th>#</th><th>Métier</th><th>Cote R la plus accessible</th><th>Accès</th><th>Exposition à l'IA</th></tr></thead>
+  <tbody>${T.map((r,i)=>{const j=J[r.id],b=bestEntry(j),s=status(j);return`<tr>
+   <td class="n">${i+1}</td>
+   <td><b>${j.t}</b>${r.dec?"":`<span class="nd">non départagé en duel</span>`}</td>
+   <td>${b?fmtR(b.v):"Sur dossier"}<span class="sub">${b?U[b.u][0]:"voir détails"}</span></td>
+   <td><span class="st ${s.cls}">${s.lbl}</span></td>
+   <td><span class="tag"><span class="dot ai-${j.ai}"></span>${AI_SHORT[j.ai]}</span></td></tr>`}).join("")}</tbody>
+ </table></div>
+
+ <h3>Les détails, métier par métier</h3>
+ <div class="res">${T.map((r,i)=>{const j=J[r.id];return`
+  <details class="r" ${i<3?"open":""}>
+   <summary><span class="rank">${i+1}</span><span><span class="rt">${j.t}</span></span><span class="chev" aria-hidden="true">▾</span></summary>
+   <div class="rbody">
+    <p style="margin-top:14px">${j.d}</p>${tags(j)}
+    ${j.progs.map(p=>`<div class="prog"><h4>Programme : ${p[0]}${okPre(p[2])?"":` <span class="st app">Cours d'appoint requis</span>`}</h4>${uniList(p[1])}</div>`).join("")}
+    ${j.note?`<p class="note">${j.note}</p>`:""}
+    ${j.der.length?`<div class="derived"><b>Métiers connexes avec la même formation</b><div class="chips">${j.der.map(x=>`<span class="chip"><span class="dot ai-${x.ai}"></span>${x.t}</span>`).join("")}</div></div>`:""}
+   </div>
+  </details>`}).join("")}</div>
+ ${others.length?`<p class="others"><b>Aussi dans tes coups de cœur :</b> ${others.map(id=>J[id].t).join(", ")}.</p>`:""}
+ <div class="row" style="margin-top:18px">
+  <button class="btn" id="copy">Copier le résumé</button>
+  <button class="btn ghost" id="reduel">Refaire les duels</button>
+  <button class="btn ghost" id="retri">Revoir le tri</button>
+ </div>
+ <div id="fb"></div>
+ <div class="legend">
+  <p><b>Cours d'appoint requis.</b> Le programme exige des cours que ton DEC ne contient pas (par exemple biologie, chimie, physique ou mathématiques). Ce n'est pas une porte fermée : ces cours peuvent se faire en une session de plus au cégep ou à distance (Cégep à distance). Parles-en à ton API ou à ton conseiller·ère d'orientation.</p>
+  <p><b>Cote R.</b> Plus basse cote R admise à l'automne 2025 (pour la médecine : plus basse cote convoquée en entrevue). « À ta portée » : au moins 1 point sous ta cote; « Serré » : à un demi-point près. Ce sont des repères, pas des garanties : les seuils changent chaque année, et certains programmes ajoutent une entrevue, le test CASPer ou un questionnaire de motivation. Si ta cote R est un peu sous le seuil, fais quand même la demande et ajoute un 2e et un 3e choix accessibles.</p>
+  <p><b>Exposition à l'IA.</b> Part des tâches d'un métier que l'IA peut accélérer ou automatiser d'ici une dizaine d'années. Une exposition élevée ne veut pas dire que le métier disparaît : il change, et on y embauche souvent moins de débutants.</p>
+  <p><b>Distances.</b> Distance routière approximative depuis Saint-Jérôme.</p>
+  <p><b>À vérifier.</b> Avant de faire une demande, confirme les préalables, les campus et les dates limites sur le site de chaque université.</p>
+ </div>`;
+ const inp=document.getElementById("crIn");
+ inp.onchange=()=>{const v=parseFloat(String(inp.value).replace(",","."));if(!isNaN(v)&&v>=15&&v<=40){st.cr=v;const open=[...app.querySelectorAll("details.r")].map(d=>d.open);render();app.querySelectorAll("details.r").forEach((d,i)=>{d.open=open[i]})}};
+ document.getElementById("decIn").onchange=e=>{st.dec=e.target.value;const open=[...app.querySelectorAll("details.r")].map(d=>d.open);render();app.querySelectorAll("details.r").forEach((d,i)=>{d.open=open[i]})};
+ copy.onclick=copySummary;
+ reduel.onclick=()=>{st.final=null;startDuel()};
+ retri.onclick=()=>{st.step="triageDone";render()};
+}
+function summaryText(){
+ const T=top10();
+ return`Mon top ${T.length} de métiers (${DEC_LBL[st.dec||"sn"]}, cote R de référence : ${(st.cr??30).toFixed(1).replace(".",",")})\n\n`+T.map((r,i)=>{const j=J[r.id],b=bestEntry(j),s=status(j);
+  const progs=j.progs.map(p=>{const near=Object.keys(p[1]).sort((a,c)=>U[a][1]-U[c][1])[0];return`   Programme : ${p[0]}${okPre(p[2])?"":" [cours d'appoint requis]"} (le plus proche : ${U[near][0]}, cote R ${fmtR(p[1][near])})`}).join("\n");
+  return`${i+1}. ${j.t}${r.dec?"":" (non départagé)"}\n   Cote R la plus accessible : ${b?fmtR(b.v)+" ("+U[b.u][0]+")":"sur dossier"} | ${s.lbl} | IA : ${AI_SHORT[j.ai]}\n${progs}${j.der.length?"\n   Métiers connexes : "+j.der.map(x=>x.t).join(", "):""}`}).join("\n\n");
+}
+function copySummary(){
+ const t=summaryText();
+ try{if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t).then(()=>toast("Résumé copié"),()=>fallback(t));return}}catch(e){}
+ fallback(t);
+}
+function fallback(t){document.getElementById("fb").innerHTML=`<p class="kbd">Sélectionne le texte ci-dessous et copie-le.</p><textarea class="fallback" readonly></textarea>`;const ta=document.querySelector(".fallback");ta.value=t;ta.focus();ta.select()}
+function toast(m){const e=document.getElementById("toast");e.textContent=m;e.classList.add("on");setTimeout(()=>e.classList.remove("on"),1800)}
+
+
+/* ---------- Onglets ---------- */
+function tabsBar(){
+ const t=[["g","Parcours guidé"],["v","Métiers en vrac"],["c","Vue combinée"]];
+ return`<nav class="tabs" role="tablist">${t.map(([k,l])=>`<button role="tab" aria-selected="${st.tab===k}" class="${st.tab===k?"on":""}" data-tab="${k}">${l}</button>`).join("")}</nav>`;
+}
+
+/* ---------- Onglet 2 : métiers en vrac ---------- */
+const V=JOBS.map(j=>({k:j.id,t:j.t,d:j.d,p:j.id})).concat(EXTRA.map((x,i)=>({k:"x"+i,t:x[0],d:x[1],p:x[2]||null})));
+const VK=Object.fromEntries(V.map(v=>[v.k,v]));
+function rVrac(){
+ const s=st.v, N=V.length, nb=Math.ceil(N/BATCH);
+ const cnt=v=>Object.values(s.r).filter(x=>x===v).length;
+ if(!s.order.length){
+  app.innerHTML=`<h2>Métiers en vrac</h2>
+  <p class="lede">Ici, pas de questions : ${N} métiers qui demandent un baccalauréat, dans le désordre. Pour chacun, réponds à l'instinct.</p>
+  <p>Ils sont regroupés en ${nb} lots de ${BATCH}. Fais une pause entre les lots si tu veux : tout est sauvegardé. Si un métier ne te dit rien, choisis « Je ne connais pas » plutôt que de deviner.</p>
+  <div class="row"><button class="btn" id="vgo">Commencer</button></div>`;
+  vgo.onclick=()=>{s.order=V.map(v=>v.k).sort(()=>Math.random()-.5);s.i=0;s.r={};s.cont=true;render()};
+  return;
+ }
+ if(s.i>=s.order.length){
+  app.innerHTML=`<h2>C'est terminé !</h2>
+  <p class="lede">${cnt("y")} métiers aimés, ${cnt("n")} écartés, ${cnt("u")} à découvrir.</p>
+  <p>La vue combinée compare maintenant ces réponses avec ton parcours guidé.</p>
+  <div class="row"><button class="btn" id="toC">Voir la vue combinée</button><button class="btn ghost" id="vre">Recommencer les métiers en vrac</button></div>`;
+  toC.onclick=()=>{st.tab="c";render()};
+  vre.onclick=()=>{st.v={order:[],i:0,r:{},cont:true};render()};
+  return;
+ }
+ if(s.i>0&&s.i%BATCH===0&&!s.cont){
+  app.innerHTML=`<h2>Lot ${s.i/BATCH} sur ${nb} terminé.</h2>
+  <p class="lede">${cnt("y")} métiers aimés jusqu'ici. Tu peux continuer ou prendre une pause : ta progression est sauvegardée.</p>
+  <div class="row"><button class="btn" id="vc">Continuer</button><button class="btn ghost" id="toC">Voir la vue combinée</button></div>`;
+  vc.onclick=()=>{s.cont=true;render()};
+  toC.onclick=()=>{st.tab="c";render()};
+  return;
+ }
+ const v=VK[s.order[s.i]];
+ app.innerHTML=`<div class="meta-line"><span>Métier ${s.i+1} sur ${N} · lot ${Math.floor(s.i/BATCH)+1} sur ${nb}</span><span>${cnt("y")} aimé(s)</span></div>
+ <div class="bar"><b style="width:${Math.round(100*s.i/N)}%"></b></div>
+ <div class="card"><div class="jt">${v.t}</div><p style="margin:0">${v.d}</p></div>
+ <div class="tri">
+  <button class="y" data-v="y">J'aime<small>touche →</small></button>
+  <button class="m" data-v="u">Je ne connais pas<small>touche ↓</small></button>
+  <button class="n" data-v="n">Je n'aime pas<small>touche ←</small></button>
+ </div>
+ ${s.i>0?`<button class="back" id="vbk">Revenir au métier précédent</button>`:""}`;
+ app.querySelectorAll(".tri [data-v]").forEach(b=>b.onclick=()=>vrac(b.dataset.v));
+ if(s.i>0)vbk.onclick=()=>{s.i--;s.cont=true;render()};
+}
+function vrac(x){const s=st.v;if(s.i>=s.order.length)return;s.r[s.order[s.i]]=x;s.i++;s.cont=false;render()}
+
+/* ---------- Onglet 3 : vue combinée ---------- */
+function rCombo(){
+ const liked2={};V.forEach(v=>{if(st.v.r[v.k]==="y"&&v.p){(liked2[v.p]=liked2[v.p]||[]).push(v.t)}});
+ const rank=id=>(st.final||[]).indexOf(id);
+ const like1=id=>st.tri[id]==="y"||rank(id)>=0;
+ const hasG=Object.keys(st.tri).length>0, hasV=Object.keys(st.v.r).length>0;
+ if(!hasG||!hasV){
+  app.innerHTML=`<h2>Vue combinée</h2><div class="empty"><p>Cette vue compare tes deux façons de choisir. Il faut avoir commencé les deux onglets.</p>
+  <p>${hasG?"✓ Parcours guidé commencé":"○ Parcours guidé : pas encore commencé"}<br>${hasV?"✓ Métiers en vrac commencés":"○ Métiers en vrac : pas encore commencés"}</p>
+  <div class="row"><button class="btn" id="goMissing">${!hasG?"Aller au parcours guidé":"Aller aux métiers en vrac"}</button></div></div>`;
+  goMissing.onclick=()=>{st.tab=!hasG?"g":"v";render()};
+  return;
+ }
+ const agree=Object.keys(liked2).filter(like1).sort((a,b)=>{const ra=rank(a),rb=rank(b);if(ra>=0&&rb>=0)return ra-rb;if(ra>=0)return-1;if(rb>=0)return 1;return liked2[b].length-liked2[a].length});
+ const surprise=Object.keys(liked2).filter(id=>!like1(id)).sort((a,b)=>liked2[b].length-liked2[a].length);
+ const why=id=>st.tri[id]==="n"?"Écarté au tri du parcours guidé":st.tri[id]==="m"?"« Peut-être » au parcours guidé":"Pas présenté au parcours guidé (moins aligné avec tes réponses au questionnaire)";
+ const families=Object.keys(liked2).sort((a,b)=>liked2[b].length-liked2[a].length).slice(0,8);
+ const unknown=V.filter(v=>st.v.r[v.k]==="u").map(v=>v.t);
+ const orphans=V.filter(v=>st.v.r[v.k]==="y"&&!v.p).map(v=>v.t);
+ const item=(id,sub)=>{const j=J[id];return`<div class="ci"><div class="ci-h"><b>${j.t}</b><span class="tag"><span class="dot ai-${j.ai}"></span>${AI_SHORT[j.ai]}</span></div>
+  <p class="ci-s">${sub}</p><p class="ci-l">Aimés dans cette famille : ${liked2[id].join(", ")}</p></div>`};
+ const done=st.v.i>=st.v.order.length;
+ app.innerHTML=`<h2>Vue combinée</h2>
+ <p class="lede">Chaque métier aimé dans « Métiers en vrac » est rattaché à la formation qui y mène. On compare ensuite avec ton parcours guidé.${done?"":` Tu as fait ${st.v.i} métiers en vrac sur ${V.length} : la vue s'enrichira en continuant.`}</p>
+
+ <h3>Là où les deux approches se rejoignent</h3>
+ <p class="ci-intro">Les signaux les plus forts : tu les as choisis dans le parcours guidé et aussi à l'instinct.</p>
+ <div class="clist">${agree.length?agree.map(id=>item(id,rank(id)>=0?`Classé n° ${rank(id)+1} dans tes duels`:"Coup de cœur au tri du parcours guidé")).join(""):`<p class="empty">Aucun point commun pour l'instant.</p>`}</div>
+
+ <h3>Surprises à explorer</h3>
+ <p class="ci-intro">Aimés à l'instinct, mais pas retenus dans le parcours guidé. Ça vaut une discussion : le questionnaire a peut-être raté quelque chose.</p>
+ <div class="clist">${surprise.length?surprise.map(id=>item(id,why(id))).join(""):`<p class="empty">Aucune surprise : tes deux approches sont cohérentes.</p>`}</div>
+
+ <h3>Les formations qui reviennent le plus</h3>
+ <p class="ci-intro">Nombre de métiers aimés en vrac auxquels chaque formation donne accès.</p>
+ <div class="tblwrap"><table class="top"><thead><tr><th>Formation</th><th>Métiers aimés</th><th>Plus proche de Saint-Jérôme</th><th>Cote R la plus accessible</th></tr></thead><tbody>
+ ${families.map(id=>{const j=J[id],p=j.progs[0],near=Object.keys(p[1]).sort((a,b)=>U[a][1]-U[b][1])[0],b=bestEntry(j),s=status(j);
+  return`<tr><td><b>${p[0]}</b><span class="sub">mène à : ${j.t}</span></td><td class="n">${liked2[id].length}</td><td>${U[near][0]}<span class="sub">${U[near][1]===0?"sur place":"≈ "+U[near][1]+" km"}</span></td><td>${b?fmtR(b.v):"Sur dossier"} <span class="st ${s.cls}">${s.lbl}</span></td></tr>`}).join("")}
+ </tbody></table></div>
+
+ ${orphans.length?`<h3>Aimés, hors des formations du parcours guidé</h3><p>${orphans.join(", ")}.</p>`:""}
+ ${unknown.length?`<h3>À découvrir</h3><p class="ci-intro">Tu ne connaissais pas ces métiers. Une recherche rapide ou une discussion pourrait en révéler un intéressant.</p><div class="chips">${unknown.map(t=>`<span class="chip">${t}</span>`).join("")}</div>`:""}
+ <p class="kbd" style="margin-top:22px">Programme : ${DEC_LBL[st.dec||"sn"]}${st.dec?"":" (par défaut)"} · cote R : ${CR().toFixed(1).replace(".",",")}${st.cr==null?" (par défaut)":""}. Ces deux valeurs se choisissent au début du parcours guidé et se modifient dans ses résultats.</p>`;
+}
+
+/* ---------- Clavier ---------- */
+document.addEventListener("keydown",e=>{
+ if(document.getElementById("modal").classList.contains("on")){if(e.key==="Escape")closeModal();return}
+ if(e.target&&e.target.tagName==="INPUT")return;
+ if(st.tab==="v"){const s=st.v;if(s.order.length&&s.i<s.order.length&&!(s.i>0&&s.i%BATCH===0&&!s.cont)){if(e.key==="ArrowRight")vrac("y");else if(e.key==="ArrowLeft")vrac("n");else if(e.key==="ArrowDown"){e.preventDefault();vrac("u")}}return}
+ if(st.tab!=="g")return;
+ const q=Q[st.qi];
+ if(st.step==="quiz"&&q&&!q.opts&&/^[1-5]$/.test(e.key))answer(+e.key);
+ else if(st.step==="quiz"&&q&&q.opts&&/^[1-9]$/.test(e.key)&&+e.key<=q.opts.length)answer(+e.key-1);
+ else if(st.step==="triage"){if(e.key==="ArrowRight")triage("y");else if(e.key==="ArrowDown"){e.preventDefault();triage("m")}else if(e.key==="ArrowLeft")triage("n")}
+ else if(st.step==="duel"){if(e.key==="ArrowLeft")duelPick("L");else if(e.key==="ArrowRight")duelPick("R")}
+});
+
+/* ---------- Réinitialisation ---------- */
+const modal=document.getElementById("modal");
+function closeModal(){modal.classList.remove("on");document.getElementById("resetBtn").focus()}
+document.getElementById("resetBtn").onclick=()=>{modal.classList.add("on");document.getElementById("mNo").focus()};
+document.getElementById("mNo").onclick=closeModal;
+modal.onclick=e=>{if(e.target===modal)closeModal()};
+document.getElementById("mYes").onclick=()=>{
+ try{localStorage.removeItem(KEY);localStorage.removeItem("boussole-metiers-v1");localStorage.removeItem("boussole-metiers-v2");localStorage.removeItem("boussole-metiers-v3")}catch(e){}
+ st=fresh();closeModal();render();toast("Tout a été effacé");window.scrollTo(0,0);
+};
+
+render();
+</script>
+</body>
+</html>
