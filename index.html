@@ -172,6 +172,14 @@ h3{margin-top:1.4em}
 .st.app{background:var(--soft-signal);border:1px dashed var(--signal);color:var(--ink)}
 h4 .st{vertical-align:middle;margin-left:.4rem}
 .crbox select{font:inherit;font-size:.95rem;padding:.45rem .6rem;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);max-width:100%}
+.st.app2{background:var(--soft-alert);border:1px dashed var(--alert);color:var(--alert)}
+.note-box{background:var(--soft-signal);border-left:4px solid var(--signal);border-radius:12px;padding:12px 16px;margin:16px 0;font-size:.95rem;max-width:none}
+.consent p{max-width:none}
+.consent-check{display:flex;gap:.7rem;align-items:flex-start;margin:18px 0;font-weight:700;cursor:pointer}
+.consent-check input{width:1.3rem;height:1.3rem;flex:none;margin-top:.15rem;accent-color:var(--pine)}
+.backtop{background:none;border:0;color:var(--muted);font-weight:700;padding:.5rem .2rem;margin:-6px 0 6px -.2rem;min-height:44px;font-size:.95rem}
+.backtop:hover{color:var(--ink)}
+.tri button.chosen{outline:3px solid var(--signal);outline-offset:3px}
 .nd{font-size:.75rem;color:var(--muted);font-style:italic}
 </style>
 </head>
@@ -190,7 +198,7 @@ h4 .st{vertical-align:middle;margin-left:.4rem}
 <div class="modal-bg" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
   <div class="modal">
     <h3 id="mTitle">Tout recommencer ?</h3>
-    <p>Tes réponses dans les trois onglets (questions, tri, duels, métiers en vrac) seront effacées. Cette action ne peut pas être annulée.</p>
+    <p id="mText">Tes réponses dans les trois onglets (questions, sélection, duels, métiers en vrac) seront effacées. Cette action ne peut pas être annulée.</p>
     <div class="row">
       <button class="btn" id="mYes" type="button" style="background:var(--alert)">Tout effacer</button>
       <button class="btn ghost" id="mNo" type="button">Annuler</button>
@@ -243,7 +251,7 @@ function fmtR(v){
  return"n.d.";
 }
 function CR(){return st.cr??30}
-function crClass(v){const e=effR(v);if(e==null)return"na";const d=e-CR();return d<=-1?"ok":d<=0.5?"tight":"hi"}
+function crClass(v){if(st.dec==="pre")return"na";const e=effR(v);if(e==null)return"na";const d=e-CR();return d<=-1?"ok":d<=0.5?"tight":"hi"}
 
 /* ---------- Métiers (tous exigent au minimum un baccalauréat) ----------
  dims : H aider · S santé · T terrain · L labo · I informatique · C construire · N nature · E enseigner · M chiffres · D créer · J lois/société
@@ -537,8 +545,16 @@ const PREQ={gciv:"SN",gmec:"SN",gele:"SN",glog:"SN",gbio:"SN",gchi:"SN",gaer:"SN
  bio:"SN",bch:"SN",mic:"SN",pharmaco:"SN",neuro:"SN",bioinf:"SN",fors:"SN",chim:"SN",phys:"SN",geol:"SN",ocean:"SN",met:"SN",env:"SN",agr:"SN",for:"SN",
  act:"M",dat:"M",dev:"M",cyb:"M",eco:"M",cpa:"M",fin:"M",gestion:"M",mkt:"M",demo:"M",arch:"M"};
 JOBS.forEach(j=>j.progs.forEach(p=>{if(!p[2])p[2]=PREQ[j.id]||"0"}));
-const DEC_LBL={sn:"Sciences de la nature",shm:"Sciences humaines avec mathématiques",sh:"Sciences humaines sans mathématiques"};
-function okPre(code){const d=st.dec||"sn";return code==="0"||d==="sn"||(code==="M"&&d==="shm")}
+const DEC_LBL={sn:"Sciences de la nature",shm:"Sciences humaines avec mathématiques",sh:"Sciences humaines sans mathématiques",pre:"Pas encore au cégep : aide-moi à choisir mon programme"};
+const PRE=()=>st.dec==="pre";
+function okPre(code){const d=st.dec||"sn";return code==="0"||d==="sn"||d==="pre"||(code==="M"&&d==="shm")}
+/* Écart de préalables : 0 = accessible · 1 = cours d'appoint en maths · 2 = parcours complet en sciences */
+function progGap(code){return okPre(code)?0:code==="M"?1:2}
+function jobGap(j){const e=j.id==="ips"?[j.progs[0]]:j.progs;return Math.min(...e.map(p=>progGap(p[2])))}
+function minCode(j){const e=j.id==="ips"?[j.progs[0]]:j.progs;const c=e.map(p=>p[2]);return c.includes("0")?"0":c.includes("M")?"M":"SN"}
+const REQ_LBL={"0":"Tout DEC préuniversitaire","M":"Sciences humaines avec maths ou Sciences de la nature","SN":"Sciences de la nature"};
+const REQ_CLS={"0":"ok","M":"tight","SN":"app2"};
+const GAP_LBL={1:"Cours d'appoint en maths",2:"Parcours en sciences requis"};
 function jobOpen(j){return j.progs.some(p=>okPre(p[2]))}
 const AI_LBL={F:"Exposition à l'IA : faible",M:"Exposition à l'IA : modérée",E:"Exposition à l'IA : élevée"};
 const AI_SHORT={F:"Faible",M:"Modérée",E:"Élevée"};
@@ -554,8 +570,9 @@ function bestEntry(j){
 }
 const GATE={orth:"maîtrise",aud:"maîtrise",psy:"doctorat",ips:"maîtrise IPS"};
 function status(j){
+ if(PRE()){const c=minCode(j);return{cls:REQ_CLS[c],lbl:REQ_LBL[c]}}
  const b=bestEntry(j);
- if(b&&b.app)return{cls:"app",lbl:"Cours d'appoint requis"};
+ if(b&&b.app){const g=jobGap(j);return{cls:g===2?"app2":"app",lbl:GAP_LBL[g]}}
  if(GATE[j.id]&&(!b||b.e<=CR()+0.5))return{cls:"tight",lbl:(GATE[j.id]==="doctorat"?"Sélection au doctorat":"Sélection à la "+GATE[j.id])};
  if(!b||b.e==null)return{cls:"na",lbl:"Sur dossier"};
  const d=b.e-CR();
@@ -603,9 +620,9 @@ const Q=[
  {k:"R",t:"Écrire, argumenter et débattre de mes idées, ça me plaît."},
  {k:"G",t:"L'actualité, la politique et les autres cultures me passionnent."},
  {k:"W",t:"Dans quel milieu te vois-tu le plus travailler ?",opts:["À l'hôpital ou en clinique","Dans un bureau","Dans un laboratoire","Dehors ou sur le terrain","Dans une école","Un mélange, ça me va"]},
- {k:"B",t:"Voir du sang, des blessures ou des personnes très malades ne me dérange pas."},
- {k:"O",t:"Travailler de soir, de nuit, la fin de semaine ou sur appel ne me dérange pas."},
- {k:"U",t:"J'aime les situations urgentes où il faut garder son calme et agir vite."},
+ {k:"B",t:"Je suis à l'aise avec la vue du sang, de blessures ou de personnes très malades."},
+ {k:"O",t:"Je suis à l'aise de travailler de soir, de nuit, la fin de semaine ou sur appel."},
+ {k:"U",t:"Je suis à l'aise dans les situations urgentes, où il faut garder son calme et agir vite."},
  {k:"P",t:"Comment préfères-tu travailler ?",opts:["Au sein d'une grande équipe","Un peu des deux","De façon autonome, peut-être avec ma propre pratique ou entreprise"]}
 ];
 const SCALE=["Pas du tout","Peu","Neutre","Assez","Tout à fait"];
@@ -824,7 +841,7 @@ function computeOrder(){
   if(ur)s+=((A.U??3)-3)*0.25*ur;
   if(P===2&&pr)s+=0.3;
   if(P===0)s+=pr?-0.2:0.1;
-  if(!jobOpen(j))s-=0.4;
+  const g=jobGap(j);if(g===1)s-=0.4;else if(g===2)s-=1.5;
   st.scores[j.id]=+s.toFixed(3);
  });
  st.order=JOBS.map(j=>j.id).sort((a,b)=>st.scores[b]-st.scores[a]);
@@ -832,11 +849,12 @@ function computeOrder(){
 
 /* ---------- Rendu ---------- */
 const app=document.getElementById("app");
-const STEPS=["Questions","Tri","Duels","Résultats"];
+const STEPS=["Questions","Sélection","Duels","Résultats"];
 function trail(i){return`<div class="trail" aria-hidden="true">${STEPS.map((_,n)=>`<span class="${n<i?"on":n===i?"now":""}"></span>`).join("")}</div><p class="trail-label">Étape ${i+1} de 4 : ${STEPS[i]}</p>`}
 function tags(j,noY){return`<div class="facts"><span class="tag"><span class="dot ai-${j.ai}"></span>${AI_LBL[j.ai]}</span>${noY?"":`<span class="tag">${YRS_LBL[j.yrs]}</span>`}</div><p class="why">${j.why}</p>`}
 
 function draw(){
+ if(!st.consent&&!(st.tab==="g"&&st.step==="welcome"))return rConsent();
  if(st.tab==="v")return rVrac();
  if(st.tab==="c")return rCombo();
  const s=st.step;
@@ -848,40 +866,56 @@ function draw(){
  if(s==="duel")return rDuel();
  if(s==="results")return rResults();
 }
+let BACK=null;
+function goBack(){if(BACK){const f=BACK;f();window.scrollTo(0,0)}}
 function render(){
- save();draw();
+ BACK=null;save();draw();
+ const ob=document.getElementById("bkTop");if(ob)ob.remove();
+ if(BACK){app.insertAdjacentHTML("afterbegin",`<button class="backtop" id="bkTop" type="button">← Retour</button>`);document.getElementById("bkTop").onclick=goBack}
  const old=app.querySelector(".tabs");if(old)old.remove();
  app.insertAdjacentHTML("afterbegin",tabsBar());
  app.querySelectorAll(".tabs [data-tab]").forEach(b=>b.onclick=()=>{st.tab=b.dataset.tab;render();window.scrollTo(0,0)});
 }
 function rWelcome(){
  app.innerHTML=`
- <h1>Audrey, trouve le métier qui te ressemble.</h1>
+ <h1>Bonjour les amis de St-Colomban&nbsp;!</h1>
  <p class="lede">Ici, on part des métiers, pas des programmes. Tu choisis d'abord ce qui t'allume; le chemin universitaire vient à la fin.</p>
  <ol class="steps-intro">
-  <li><div><b>Ton programme, ta cote R, puis 18 questions rapides</b><span>Sur tes intérêts et sur la réalité du travail qui te convient, pour repérer les métiers qui te ressemblent parmi ${JOBS.length}.</span></div></li>
-  <li><div><b>Un tri express</b><span>Oui, peut-être ou non, un métier à la fois. On commence par les ${FIRST} qui te ressemblent le plus.</span></div></li>
+  <li><div><b>Ton programme au cégep (ou ta situation), puis 18 questions rapides</b><span>Sur tes intérêts et sur la réalité du travail qui te convient, pour repérer les métiers qui te ressemblent parmi ${JOBS.length}.</span></div></li>
+  <li><div><b>Une sélection express</b><span>Oui, peut-être ou non, un métier à la fois. On commence par les ${FIRST} qui te ressemblent le plus.</span></div></li>
   <li><div><b>Des duels</b><span>Deux métiers, tu choisis celui qui te ressemble le plus. On répète jusqu'à obtenir ton classement.</span></div></li>
-  <li><div><b>Ton top 10</b><span>Avec la cote R, l'exposition à l'IA, les métiers connexes et les universités, du plus proche au plus loin de Saint-Jérôme.</span></div></li>
+  <li><div><b>Ton top 10</b><span>Avec la cote R, les préalables, l'exposition à l'IA, les métiers connexes et les universités, du plus proche au plus loin de Saint-Jérôme.</span></div></li>
  </ol>
  <p>Compte environ 15 minutes. Ta progression est sauvegardée : tu peux fermer la page et revenir. L'onglet « Métiers en vrac » propose ensuite une autre approche, sans questions.</p>
  <div class="row"><button class="btn" id="go">Commencer</button></div>`;
  go.onclick=()=>{st.step="setup";render()};
 }
 
+function rConsent(){
+ BACK=()=>{st.tab="g";st.step="welcome";render()};
+ app.innerHTML=CONSENT_HTML;
+ const cb=document.getElementById("okc"),b=document.getElementById("okGo");
+ cb.onchange=()=>{b.disabled=!cb.checked};
+ b.onclick=()=>{if(!cb.checked)return;st.consent=true;if(st.tab==="g"&&st.step==="welcome")st.step="setup";render();window.scrollTo(0,0)};
+}
+
 function rSetup(){
+ BACK=()=>{st.step="welcome";render()};
+ const shNote=(st.dec==="sh"||st.dec==="shm")?`<p class="note-box"><b>À noter.</b> Les métiers qui exigent un parcours complet en sciences de la nature (génie, santé, sciences pures) restent dans l'outil pour l'exercice, mais ils apparaîtront beaucoup plus rarement : y accéder à partir de Sciences humaines demande souvent près d'une année de cours d'appoint.</p>`:"";
+ const preNote=PRE()?`<p class="note-box"><b>Bienvenue !</b> Réponds aux questions comme d'habitude. À la fin, l'outil t'indiquera quel programme de cégep ouvre la porte aux métiers que tu auras choisis.</p>`:"";
  app.innerHTML=`${trail(0)}<h2>Avant de commencer</h2>
  <p class="qcount">Ton programme au cégep</p>
  <div class="choices" id="decs">${Object.entries(DEC_LBL).map(([k,l])=>`<button data-d="${k}" class="${st.dec===k?"sel":""}">${l}</button>`).join("")}</div>
- <div class="crbox"><label for="crS"><b>Ta cote R actuelle</b></label>
+ ${shNote}${preNote}
+ ${PRE()?"":`<div class="crbox"><label for="crS"><b>Ta cote R actuelle</b></label>
   <input id="crS" type="number" inputmode="decimal" step="0.1" min="15" max="40" placeholder="ex. 28,5" value="${st.cr!=null?st.cr.toFixed(1):""}">
-  <small>Une estimation suffit. Tu pourras la modifier dans les résultats.</small></div>
+  <small>Une estimation suffit. Tu pourras la modifier dans les résultats.</small></div>`}
  <div class="row"><button class="btn" id="setGo" ${st.dec?"":"disabled"}>Continuer</button></div>
  <p class="kbd" id="setMsg"></p>`;
  const inp=document.getElementById("crS");
- const readCr=()=>{const v=parseFloat(String(inp.value).replace(",","."));return(!isNaN(v)&&v>=15&&v<=40)?v:null};
+ const readCr=()=>{if(!inp)return null;const v=parseFloat(String(inp.value).replace(",","."));return(!isNaN(v)&&v>=15&&v<=40)?v:null};
  app.querySelectorAll("#decs [data-d]").forEach(b=>b.onclick=()=>{const c=readCr();if(c!=null)st.cr=c;st.dec=b.dataset.d;render()});
- setGo.onclick=()=>{const c=readCr();if(c==null){document.getElementById("setMsg").textContent="Entre une cote R entre 15 et 40 (une estimation suffit).";inp.focus();return}st.cr=c;st.step="quiz";st.qi=0;render()};
+ setGo.onclick=()=>{if(PRE()){st.step="quiz";st.qi=0;return render()}const c=readCr();if(c==null){document.getElementById("setMsg").textContent="Entre une cote R entre 15 et 40 (une estimation suffit).";inp.focus();return}st.cr=c;st.step="quiz";st.qi=0;render()};
 }
 function rQuiz(){
  const q=Q[st.qi], cur=st.ans[q.k];
@@ -889,14 +923,13 @@ function rQuiz(){
   ?`<div class="choices">${q.opts.map((o,i)=>`<button data-v="${i}" class="${cur===i?"sel":""}">${o}</button>`).join("")}</div>`
   :`<div class="scale">${SCALE.map((o,i)=>`<button data-v="${i+1}" class="${cur===i+1?"sel":""}" aria-label="${o}"><i>${i+1}</i>${o}</button>`).join("")}</div>`;
  app.innerHTML=`${trail(0)}<div class="qcount">Question ${st.qi+1} sur ${Q.length}</div><p class="qtext">${q.t}</p>${body}
- <button class="back" id="bk">${st.qi>0?"Question précédente":"Revenir au programme et à la cote R"}</button>
  ${q.opts?"":`<p class="kbd">Astuce : tu peux aussi répondre avec les touches 1 à 5.</p>`}`;
  app.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>answer(+b.dataset.v));
- bk.onclick=()=>{if(st.qi>0)st.qi--;else st.step="setup";render()};
+ BACK=()=>{if(st.qi>0)st.qi--;else st.step="setup";render()};
 }
 function answer(v){
  st.ans[Q[st.qi].k]=v; st.qi++;
- if(st.qi>=Q.length){computeOrder();st.step="triage";st.ti=0;st.tri={};st.shown=FIRST}
+ if(st.qi>=Q.length){computeOrder();st.shown=Math.max(st.shown||FIRST,FIRST);const L=triList(),f=L.findIndex(id=>!st.tri[id]);st.ti=f<0?L.length:f;st.step="triage"}
  render();
 }
 
@@ -911,32 +944,36 @@ function rTriage(){
   ${j.der.length?`<p class="also"><b>Avec la même formation, on peut aussi devenir :</b> ${j.der.map(x=>x.t).join(", ")}.</p>`:""}
  </div>
  <div class="tri">
-  <button class="y" data-v="y">Ça m'intéresse<small>touche →</small></button>
-  <button class="m" data-v="m">Peut-être<small>touche ↓</small></button>
-  <button class="n" data-v="n">Pas pour moi<small>touche ←</small></button>
+  <button class="y ${st.tri[j.id]==="y"?"chosen":""}" data-v="y">Ça m'intéresse<small>touche →</small></button>
+  <button class="m ${st.tri[j.id]==="m"?"chosen":""}" data-v="m">Peut-être<small>touche ↓</small></button>
+  <button class="n ${st.tri[j.id]==="n"?"chosen":""}" data-v="n">Pas pour moi<small>touche ←</small></button>
  </div>
- ${st.ti>0?`<button class="back" id="bk">Revenir au métier précédent</button>`:""}`;
+ ${st.tri[j.id]?`<p class="kbd">Ta réponse actuelle est encadrée. Choisis-en une autre pour la changer, ou la même pour la garder.</p><button class="back" id="skipEnd">Terminer et voir le résumé de ma sélection</button>`:""}`;
  app.querySelectorAll(".tri [data-v]").forEach(b=>b.onclick=()=>triage(b.dataset.v));
- if(st.ti>0)bk.onclick=()=>{st.ti--;render()};
+ const se=document.getElementById("skipEnd");if(se)se.onclick=()=>{st.step="triageDone";render()};
+ BACK=()=>{if(st.ti>0)st.ti--;else{st.step="quiz";st.qi=Q.length-1}render()};
 }
 function triage(v){const list=triList();if(st.ti>=list.length)return;st.tri[list[st.ti]]=v;st.ti++;render()}
 
 function rTriageDone(){
+ BACK=()=>{st.step="triage";st.ti=Math.max(0,triList().length-1);render()};
  const y=Object.keys(st.tri).filter(k=>st.tri[k]==="y"), m=Object.keys(st.tri).filter(k=>st.tri[k]==="m");
  const more=st.order.length-st.shown;
  const canDuel=y.length+m.length>0;
  app.innerHTML=`${trail(1)}
  <h2>${y.length} coup${y.length>1?"s":""} de cœur, ${m.length} peut-être.</h2>
- <p class="lede">${canDuel?(y.length>=2?"Tes coups de cœur passeront aux duels.":"Comme tu as moins de deux coups de cœur, tes « peut-être » passeront aussi aux duels.")+(y.length>10?" On garde les 10 qui collent le mieux à tes réponses; les autres resteront visibles dans tes résultats.":""):"Aucun métier retenu pour l'instant. Regarde d'autres métiers ou recommence le tri."}</p>
+ <p class="lede">${canDuel?(y.length>=2?"Tes coups de cœur passeront aux duels.":"Comme tu as moins de deux coups de cœur, tes « peut-être » passeront aussi aux duels.")+(y.length>10?" On garde les 10 qui collent le mieux à tes réponses; les autres resteront visibles dans tes résultats.":""):"Aucun métier retenu pour l'instant. Regarde d'autres métiers ou modifie ta sélection."}</p>
  ${more>0?`<p>Il reste ${more} autres métiers, un peu moins alignés avec tes réponses. Ça vaut la peine d'y jeter un œil : une bonne surprise est toujours possible.</p>`:""}
  <div class="row">
   <button class="btn" id="toDuel" ${canDuel?"":"disabled"}>Passer aux duels</button>
   ${more>0?`<button class="btn ghost" id="more">Voir ${Math.min(STEP,more)} métiers de plus</button>`:""}
-  <button class="btn ghost" id="redo">Refaire le tri</button>
+  <button class="btn ghost" id="edit">Modifier ma sélection</button>
+  <button class="btn ghost" id="redo">Recommencer la sélection</button>
  </div>`;
  toDuel.onclick=startDuel;
  if(more>0)document.getElementById("more").onclick=()=>{st.ti=st.shown;st.shown+=STEP;st.step="triage";render()};
- redo.onclick=()=>{st.tri={};st.ti=0;st.shown=FIRST;st.step="triage";render()};
+ edit.onclick=()=>{st.ti=0;st.step="triage";render();window.scrollTo(0,0)};
+ redo.onclick=()=>askConfirm("Recommencer la sélection ?","Tous tes choix (« Ça m'intéresse », « Peut-être », « Pas pour moi ») seront effacés. Tes réponses aux questions sont conservées.","Tout effacer",()=>{st.tri={};st.ti=0;st.shown=FIRST;st.final=null;st.dh=[];st.step="triage";render()});
 }
 
 function estimate(n){let t=0;for(let k=1;k<n;k++)t+=Math.ceil(Math.log2(k+1));return t}
@@ -946,6 +983,7 @@ function startDuel(){
  st.extra=pool.slice(10); pool=pool.slice(0,10);
  if(pool.length===0)return;
  if(pool.length===1){st.final=pool;st.step="results";return render()}
+ st.dh=[];
  const shuffled=pool.slice().sort(()=>Math.random()-.5);
  st.duel={sorted:[shuffled[0]],queue:shuffled.slice(1),cur:null,lo:0,hi:0,done:0,total:estimate(pool.length),flip:false};
  nextInsert();
@@ -966,11 +1004,18 @@ function rDuel(){
  <h2>Lequel te ressemble le plus ?</h2>
  <div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><b style="width:${pct}%"></b></div>
  <div class="duel">${card(L,"L")}<div class="or">ou</div>${card(R,"R")}</div>
- <p class="kbd">Environ ${Math.max(0,d.total-d.done)} duel(s) restant(s). Touches ← et → pour choisir. Pas de mauvaise réponse : suis ton instinct.</p>`;
+ <p class="kbd">Environ ${Math.max(0,d.total-d.done)} duel(s) restant(s). Touches ← et → pour choisir. Pas de mauvaise réponse : suis ton instinct. Un mauvais clic ? « Retour » annule le dernier duel.</p>`;
  app.querySelectorAll(".pick").forEach(p=>p.onclick=()=>duelPick(p.dataset.side));
+ BACK=undoDuel;
+}
+function undoDuel(){
+ if(st.dh&&st.dh.length){st.duel=JSON.parse(st.dh.pop());st.step="duel"}
+ else{st.duel=null;st.step="triageDone"}
+ render();
 }
 function duelPick(side){
  const d=st.duel; if(!d)return;
+ (st.dh=st.dh||[]).push(JSON.stringify(d));
  const mid=Math.floor((d.lo+d.hi)/2);
  const pickedCur=(side==="L")!==d.flip;
  if(pickedCur)d.hi=mid;else d.lo=mid+1;
@@ -991,21 +1036,23 @@ function uniList(map){
  return`<ul class="unis">${arr.map((u,i)=>`<li class="${i===0?"near":""}"><span>${u.n}${i===0?`<span class="band">le plus proche</span>`:""}</span><span class="cr ${crClass(u.v)}" title="Cote R du dernier admis, automne 2025">${fmtR(u.v)}</span><span class="km">${u.km===0?"sur place":"≈ "+u.km+" km"}</span></li>`).join("")}</ul>`;
 }
 function rResults(){
+ BACK=undoDuel;
  const T=top10();
  const inTop=new Set(T.map(r=>r.id));
  const others=st.order.filter(id=>(st.tri[id]==="y")&&!inTop.has(id));
  app.innerHTML=`${trail(3)}
  <h2>Ton top ${T.length}</h2>
- <p class="lede">Classés selon tes duels. Compare la cote R demandée à la tienne et regarde l'exposition à l'IA.</p>
+ <p class="lede">${PRE()?"Classés selon tes duels. Regarde surtout quel programme de cégep ouvre la porte à chacun.":"Classés selon tes duels. Compare la cote R demandée à la tienne et regarde l'exposition à l'IA."}</p>
  <div class="crbox">
   <label for="decIn"><b>Programme</b></label>
   <select id="decIn">${Object.entries(DEC_LBL).map(([k,l])=>`<option value="${k}" ${st.dec===k?"selected":""}>${l}</option>`).join("")}</select>
-  <label for="crIn"><b>Ta cote R</b></label>
+  ${PRE()?"":`<label for="crIn"><b>Ta cote R</b></label>
   <input id="crIn" type="number" inputmode="decimal" step="0.1" min="15" max="40" value="${CR().toFixed(1)}">
-  <small>Elle évolue jusqu'à la fin du DEC : essaie quelques valeurs pour voir ce qui change.</small>
+  <small>Elle évolue jusqu'à la fin du DEC : essaie quelques valeurs pour voir ce qui change.</small>`}
  </div>
+ ${PRE()?preReco(T):""}
  <div class="tblwrap"><table class="top">
-  <thead><tr><th>#</th><th>Métier</th><th>Cote R la plus accessible</th><th>Accès</th><th>Exposition à l'IA</th></tr></thead>
+  <thead><tr><th>#</th><th>Métier</th><th>${PRE()?"Cote R indicative (dernier admis)":"Cote R la plus accessible"}</th><th>${PRE()?"Programme de cégep requis":"Accès"}</th><th>Exposition à l'IA</th></tr></thead>
   <tbody>${T.map((r,i)=>{const j=J[r.id],b=bestEntry(j),s=status(j);return`<tr>
    <td class="n">${i+1}</td>
    <td><b>${j.t}</b>${r.dec?"":`<span class="nd">non départagé en duel</span>`}</td>
@@ -1020,7 +1067,7 @@ function rResults(){
    <summary><span class="rank">${i+1}</span><span><span class="rt">${j.t}</span></span><span class="chev" aria-hidden="true">▾</span></summary>
    <div class="rbody">
     <p style="margin-top:14px">${j.d}</p>${tags(j)}
-    ${j.progs.map(p=>`<div class="prog"><h4>Programme : ${p[0]}${okPre(p[2])?"":` <span class="st app">Cours d'appoint requis</span>`}</h4>${uniList(p[1])}</div>`).join("")}
+    ${j.progs.map(p=>`<div class="prog"><h4>Programme : ${p[0]}${PRE()?` <span class="st ${REQ_CLS[p[2]]}">${REQ_LBL[p[2]]}</span>`:okPre(p[2])?"":` <span class="st ${progGap(p[2])===2?"app2":"app"}">${GAP_LBL[progGap(p[2])]}</span>`}</h4>${uniList(p[1])}</div>`).join("")}
     ${j.note?`<p class="note">${j.note}</p>`:""}
     ${j.der.length?`<div class="derived"><b>Métiers connexes avec la même formation</b><div class="chips">${j.der.map(x=>`<span class="chip"><span class="dot ai-${x.ai}"></span>${x.t}</span>`).join("")}</div></div>`:""}
    </div>
@@ -1029,27 +1076,45 @@ function rResults(){
  <div class="row" style="margin-top:18px">
   <button class="btn" id="copy">Copier le résumé</button>
   <button class="btn ghost" id="reduel">Refaire les duels</button>
-  <button class="btn ghost" id="retri">Revoir le tri</button>
+  <button class="btn ghost" id="retri">Modifier ma sélection</button>
  </div>
  <div id="fb"></div>
  <div class="legend">
-  <p><b>Cours d'appoint requis.</b> Le programme exige des cours que ton DEC ne contient pas (par exemple biologie, chimie, physique ou mathématiques). Ce n'est pas une porte fermée : ces cours peuvent se faire en une session de plus au cégep ou à distance (Cégep à distance). Parles-en à ton API ou à ton conseiller·ère d'orientation.</p>
-  <p><b>Cote R.</b> Plus basse cote R admise à l'automne 2025 (pour la médecine : plus basse cote convoquée en entrevue). « À ta portée » : au moins 1 point sous ta cote; « Serré » : à un demi-point près. Ce sont des repères, pas des garanties : les seuils changent chaque année, et certains programmes ajoutent une entrevue, le test CASPer ou un questionnaire de motivation. Si ta cote R est un peu sous le seuil, fais quand même la demande et ajoute un 2e et un 3e choix accessibles.</p>
+  <p><b>Outil personnel non officiel.</b> Les résultats sont des repères pour réfléchir, pas une recommandation officielle.</p>
+  ${PRE()?`<p><b>Programme de cégep requis.</b> Programme préuniversitaire le moins exigeant qui donne directement accès au programme universitaire. Sciences de la nature demande généralement, en 5e secondaire, les mathématiques SN (ou TS), la chimie et la physique; les exigences en maths de Sciences humaines varient selon le cégep. Un DEC technique peut aussi mener à l'université grâce aux passerelles DEC-BAC.</p>`:`<p><b>Cours d'appoint en maths.</b> Il manque surtout des cours de mathématiques : souvent faisable en une session de plus ou à distance (Cégep à distance).</p>
+  <p><b>Parcours en sciences requis.</b> Il manque plusieurs cours de biologie, de chimie, de physique ou de maths : souvent près d'une année de cours d'appoint. Ces métiers restent affichés pour l'exercice. Parles-en à ton API ou à ton conseiller·ère d'orientation.</p>`}
+  <p><b>Cote R.</b> ${PRE()?"Au cégep, ta cote R déterminera l'accès aux programmes contingentés. Les valeurs affichées sont les plus basses cotes R admises à l'automne 2025, à titre indicatif. ":""}Plus basse cote R admise à l'automne 2025 (pour la médecine : plus basse cote convoquée en entrevue). « À ta portée » : au moins 1 point sous ta cote; « Serré » : à un demi-point près. Ce sont des repères, pas des garanties : les seuils changent chaque année, et certains programmes ajoutent une entrevue, le test CASPer ou un questionnaire de motivation. Si ta cote R est un peu sous le seuil, fais quand même la demande et ajoute un 2e et un 3e choix accessibles.</p>
   <p><b>Exposition à l'IA.</b> Part des tâches d'un métier que l'IA peut accélérer ou automatiser d'ici une dizaine d'années. Une exposition élevée ne veut pas dire que le métier disparaît : il change, et on y embauche souvent moins de débutants.</p>
   <p><b>Distances.</b> Distance routière approximative depuis Saint-Jérôme.</p>
   <p><b>À vérifier.</b> Avant de faire une demande, confirme les préalables, les campus et les dates limites sur le site de chaque université.</p>
  </div>`;
  const inp=document.getElementById("crIn");
- inp.onchange=()=>{const v=parseFloat(String(inp.value).replace(",","."));if(!isNaN(v)&&v>=15&&v<=40){st.cr=v;const open=[...app.querySelectorAll("details.r")].map(d=>d.open);render();app.querySelectorAll("details.r").forEach((d,i)=>{d.open=open[i]})}};
+ if(inp)inp.onchange=()=>{const v=parseFloat(String(inp.value).replace(",","."));if(!isNaN(v)&&v>=15&&v<=40){st.cr=v;const open=[...app.querySelectorAll("details.r")].map(d=>d.open);render();app.querySelectorAll("details.r").forEach((d,i)=>{d.open=open[i]})}};
  document.getElementById("decIn").onchange=e=>{st.dec=e.target.value;const open=[...app.querySelectorAll("details.r")].map(d=>d.open);render();app.querySelectorAll("details.r").forEach((d,i)=>{d.open=open[i]})};
  copy.onclick=copySummary;
  reduel.onclick=()=>{st.final=null;startDuel()};
- retri.onclick=()=>{st.step="triageDone";render()};
+ retri.onclick=()=>{st.ti=0;st.step="triage";render();window.scrollTo(0,0)};
 }
+function preCounts(T){const c=T.map(r=>minCode(J[r.id]));return{sn:c.length,shm:c.filter(x=>x!=="SN").length,sh:c.filter(x=>x==="0").length,n:c.length}}
+function preReco(T){const k=preCounts(T);
+ return`<div class="note-box"><b>Quel programme de cégep pour tes ${k.n} métiers ?</b>
+ <p style="margin:.5em 0 0">Sciences de la nature ouvre la porte à <b>${k.sn} sur ${k.n}</b>. Sciences humaines avec maths : <b>${k.shm} sur ${k.n}</b>. Sciences humaines sans maths (ou un autre DEC préuniversitaire) : <b>${k.sh} sur ${k.n}</b>.</p>
+ <p style="margin:.5em 0 0">Conseil : choisis le programme qui ouvre la porte à tes <i>premiers</i> choix, pas forcément celui qui en ouvre le plus. Si tes trois premiers métiers n'exigent pas Sciences de la nature, un programme qui te plaît davantage peut aussi t'aider à obtenir une meilleure cote R.</p></div>`}
+function preRecoText(T){const k=preCounts(T);return`Programme de cégep : Sciences de la nature ouvre ${k.sn}/${k.n} de ces métiers; Sciences humaines avec maths ${k.shm}/${k.n}; Sciences humaines sans maths ${k.sh}/${k.n}.`}
+const CONSENT_HTML=`<h2>Avant de commencer, à lire</h2>
+ <div class="card consent">
+  <p><b>Ma boussole de métiers est un outil personnel</b>, créé en famille pour aider à réfléchir à un choix de carrière.</p>
+  <p>Il n'est <b>ni approuvé ni validé</b> par un cégep, une université, un ordre professionnel ou un conseiller·ère d'orientation. Merci de ne pas le présenter comme un outil officiel.</p>
+  <p>Les cotes R (derniers admis, automne 2025), les préalables, les distances et l'exposition à l'IA sont des <b>repères approximatifs</b> : ils peuvent contenir des erreurs et changent chaque année.</p>
+  <p>Il ne remplace pas une rencontre avec un conseiller·ère d'orientation ou un API, ni l'information officielle des établissements.</p>
+  <p style="margin-bottom:0">Tes réponses restent dans ton navigateur : rien n'est envoyé à qui que ce soit.</p>
+ </div>
+ <label class="consent-check"><input type="checkbox" id="okc"> J'ai compris que cet outil est non officiel et que ses résultats sont indicatifs.</label>
+ <div class="row"><button class="btn" id="okGo" disabled>Continuer</button></div>`;
 function summaryText(){
  const T=top10();
- return`Mon top ${T.length} de métiers (${DEC_LBL[st.dec||"sn"]}, cote R de référence : ${(st.cr??30).toFixed(1).replace(".",",")})\n\n`+T.map((r,i)=>{const j=J[r.id],b=bestEntry(j),s=status(j);
-  const progs=j.progs.map(p=>{const near=Object.keys(p[1]).sort((a,c)=>U[a][1]-U[c][1])[0];return`   Programme : ${p[0]}${okPre(p[2])?"":" [cours d'appoint requis]"} (le plus proche : ${U[near][0]}, cote R ${fmtR(p[1][near])})`}).join("\n");
+ return`Mon top ${T.length} de métiers (${DEC_LBL[st.dec||"sn"]}${PRE()?"":", cote R de référence : "+(st.cr??30).toFixed(1).replace(".",",")})\nOutil personnel non officiel : résultats indicatifs.\n\n`+(PRE()?preRecoText(T)+"\n\n":"")+T.map((r,i)=>{const j=J[r.id],b=bestEntry(j),s=status(j);
+  const progs=j.progs.map(p=>{const near=Object.keys(p[1]).sort((a,c)=>U[a][1]-U[c][1])[0];return`   Programme : ${p[0]}${PRE()?" ["+REQ_LBL[p[2]]+"]":okPre(p[2])?"":" ["+GAP_LBL[progGap(p[2])].toLowerCase()+"]"} (le plus proche : ${U[near][0]}, cote R ${fmtR(p[1][near])})`}).join("\n");
   return`${i+1}. ${j.t}${r.dec?"":" (non départagé)"}\n   Cote R la plus accessible : ${b?fmtR(b.v)+" ("+U[b.u][0]+")":"sur dossier"} | ${s.lbl} | IA : ${AI_SHORT[j.ai]}\n${progs}${j.der.length?"\n   Métiers connexes : "+j.der.map(x=>x.t).join(", "):""}`}).join("\n\n");
 }
 function copySummary(){
@@ -1087,7 +1152,8 @@ function rVrac(){
   <p>La vue combinée compare maintenant ces réponses avec ton parcours guidé.</p>
   <div class="row"><button class="btn" id="toC">Voir la vue combinée</button><button class="btn ghost" id="vre">Recommencer les métiers en vrac</button></div>`;
   toC.onclick=()=>{st.tab="c";render()};
-  vre.onclick=()=>{st.v={order:[],i:0,r:{},cont:true};render()};
+  BACK=()=>{s.i=s.order.length-1;s.cont=true;render()};
+  vre.onclick=()=>askConfirm("Recommencer les métiers en vrac ?","Toutes tes réponses dans cet onglet seront effacées.","Tout effacer",()=>{st.v={order:[],i:0,r:{},cont:true};render()});
   return;
  }
  if(s.i>0&&s.i%BATCH===0&&!s.cont){
@@ -1095,6 +1161,7 @@ function rVrac(){
   <p class="lede">${cnt("y")} métiers aimés jusqu'ici. Tu peux continuer ou prendre une pause : ta progression est sauvegardée.</p>
   <div class="row"><button class="btn" id="vc">Continuer</button><button class="btn ghost" id="toC">Voir la vue combinée</button></div>`;
   vc.onclick=()=>{s.cont=true;render()};
+  BACK=()=>{s.i--;s.cont=true;render()};
   toC.onclick=()=>{st.tab="c";render()};
   return;
  }
@@ -1107,9 +1174,9 @@ function rVrac(){
   <button class="m" data-v="u">Je ne connais pas<small>touche ↓</small></button>
   <button class="n" data-v="n">Je n'aime pas<small>touche ←</small></button>
  </div>
- ${s.i>0?`<button class="back" id="vbk">Revenir au métier précédent</button>`:""}`;
+ `;
  app.querySelectorAll(".tri [data-v]").forEach(b=>b.onclick=()=>vrac(b.dataset.v));
- if(s.i>0)vbk.onclick=()=>{s.i--;s.cont=true;render()};
+ if(s.i>0)BACK=()=>{s.i--;s.cont=true;render()};
 }
 function vrac(x){const s=st.v;if(s.i>=s.order.length)return;s.r[s.order[s.i]]=x;s.i++;s.cont=false;render()}
 
@@ -1128,7 +1195,7 @@ function rCombo(){
  }
  const agree=Object.keys(liked2).filter(like1).sort((a,b)=>{const ra=rank(a),rb=rank(b);if(ra>=0&&rb>=0)return ra-rb;if(ra>=0)return-1;if(rb>=0)return 1;return liked2[b].length-liked2[a].length});
  const surprise=Object.keys(liked2).filter(id=>!like1(id)).sort((a,b)=>liked2[b].length-liked2[a].length);
- const why=id=>st.tri[id]==="n"?"Écarté au tri du parcours guidé":st.tri[id]==="m"?"« Peut-être » au parcours guidé":"Pas présenté au parcours guidé (moins aligné avec tes réponses au questionnaire)";
+ const why=id=>st.tri[id]==="n"?"Écarté à la sélection du parcours guidé":st.tri[id]==="m"?"« Peut-être » au parcours guidé":"Pas présenté au parcours guidé (moins aligné avec tes réponses au questionnaire)";
  const families=Object.keys(liked2).sort((a,b)=>liked2[b].length-liked2[a].length).slice(0,8);
  const unknown=V.filter(v=>st.v.r[v.k]==="u").map(v=>v.t);
  const orphans=V.filter(v=>st.v.r[v.k]==="y"&&!v.p).map(v=>v.t);
@@ -1140,7 +1207,7 @@ function rCombo(){
 
  <h3>Là où les deux approches se rejoignent</h3>
  <p class="ci-intro">Les signaux les plus forts : tu les as choisis dans le parcours guidé et aussi à l'instinct.</p>
- <div class="clist">${agree.length?agree.map(id=>item(id,rank(id)>=0?`Classé n° ${rank(id)+1} dans tes duels`:"Coup de cœur au tri du parcours guidé")).join(""):`<p class="empty">Aucun point commun pour l'instant.</p>`}</div>
+ <div class="clist">${agree.length?agree.map(id=>item(id,rank(id)>=0?`Classé n° ${rank(id)+1} dans tes duels`:"Coup de cœur à la sélection du parcours guidé")).join(""):`<p class="empty">Aucun point commun pour l'instant.</p>`}</div>
 
  <h3>Surprises à explorer</h3>
  <p class="ci-intro">Aimés à l'instinct, mais pas retenus dans le parcours guidé. Ça vaut une discussion : le questionnaire a peut-être raté quelque chose.</p>
@@ -1162,6 +1229,7 @@ function rCombo(){
 document.addEventListener("keydown",e=>{
  if(document.getElementById("modal").classList.contains("on")){if(e.key==="Escape")closeModal();return}
  if(e.target&&e.target.tagName==="INPUT")return;
+ if(!st.consent)return;
  if(st.tab==="v"){const s=st.v;if(s.order.length&&s.i<s.order.length&&!(s.i>0&&s.i%BATCH===0&&!s.cont)){if(e.key==="ArrowRight")vrac("y");else if(e.key==="ArrowLeft")vrac("n");else if(e.key==="ArrowDown"){e.preventDefault();vrac("u")}}return}
  if(st.tab!=="g")return;
  const q=Q[st.qi];
@@ -1173,15 +1241,32 @@ document.addEventListener("keydown",e=>{
 
 /* ---------- Réinitialisation ---------- */
 const modal=document.getElementById("modal");
-function closeModal(){modal.classList.remove("on");document.getElementById("resetBtn").focus()}
-document.getElementById("resetBtn").onclick=()=>{modal.classList.add("on");document.getElementById("mNo").focus()};
+let CONFIRM=null;
+function closeModal(){modal.classList.remove("on");CONFIRM=null}
+function askConfirm(title,text,yes,fn){
+ document.getElementById("mTitle").textContent=title;document.getElementById("mText").textContent=text;
+ document.getElementById("mYes").textContent=yes;CONFIRM=fn;modal.classList.add("on");document.getElementById("mNo").focus();
+}
+document.getElementById("resetBtn").onclick=()=>askConfirm("Tout recommencer ?","Tes réponses dans les trois onglets (questions, sélection, duels, métiers en vrac) seront effacées. Cette action ne peut pas être annulée.","Tout effacer",()=>{
+ try{["boussole-metiers-v1","boussole-metiers-v2","boussole-metiers-v3",KEY].forEach(k=>localStorage.removeItem(k))}catch(e){}
+ st=fresh();render();toast("Tout a été effacé");window.scrollTo(0,0);
+});
 document.getElementById("mNo").onclick=closeModal;
 modal.onclick=e=>{if(e.target===modal)closeModal()};
-document.getElementById("mYes").onclick=()=>{
- try{localStorage.removeItem(KEY);localStorage.removeItem("boussole-metiers-v1");localStorage.removeItem("boussole-metiers-v2");localStorage.removeItem("boussole-metiers-v3")}catch(e){}
- st=fresh();closeModal();render();toast("Tout a été effacé");window.scrollTo(0,0);
-};
+document.getElementById("mYes").onclick=()=>{const f=CONFIRM;closeModal();if(f)f()};
 
+/* ---------- Geste « retour » du téléphone ou du navigateur ----------
+ Une entrée d'historique est ajoutée au premier clic; le geste retour ramène alors à l'écran précédent
+ au lieu de quitter l'outil. Sur l'écran d'accueil, le geste retour quitte normalement. */
+let armed=false;
+function arm(){if(armed)return;try{history.pushState({boussole:1},"");armed=true}catch(e){}}
+document.addEventListener("click",arm,true);
+window.addEventListener("popstate",()=>{
+ armed=false;
+ if(modal.classList.contains("on")){closeModal();return}
+ if(BACK){goBack();return}
+ try{history.back()}catch(e){}
+});
 render();
 </script>
 </body>
